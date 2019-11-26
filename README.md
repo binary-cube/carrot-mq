@@ -50,7 +50,7 @@ This package requires the following
 <?php
 
 use BinaryCube\CarrotMQ\CarrotMQ;
-use \BinaryCube\CarrotMQ\Driver\AmqpDriver;
+use BinaryCube\CarrotMQ\Driver\AmqpDriver;
 use BinaryCube\CarrotMQ\Processor\Processor;
 use BinaryCube\CarrotMQ\Extension\SignalExtension;
 
@@ -129,7 +129,7 @@ $extension = new SignalExtension();
 
 
 /**
- * @var \BinaryCube\CarrotMQ\Consumer $consumer
+ * @var BinaryCube\CarrotMQ\Consumer $consumer
  */
 $consumer->extensions()->add($extension::name(), $extension);
 
