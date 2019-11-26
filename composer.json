@@ -1,0 +1,107 @@
+{
+    "name": "binary-cube/carrot-mq",
+    "description": "Carrot MQ :: Food for thought",
+
+    "keywords": [
+        "carrot","mq", "message queue", "rabbit-mq", "php", "carrot-mq", "binary-cube"
+    ],
+
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Banciu N. Cristian Mihai",
+            "role": "Developer",
+            "homepage": "https://binary-cube.com"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/binary-cube/carrot-mq",
+        "issues": "https://github.com/binary-cube/carrot-mq/issues?state=open"
+    },
+
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+
+    "require": {
+        "php": ">=7.1",
+        "ext-pcntl": "*",
+        "psr/log": "1.1.*",
+        "symfony/event-dispatcher": "4.3.*",
+        "queue-interop/amqp-interop": "^0.8"
+    },
+
+    "require-dev": {
+        "enqueue/amqp-lib": "*",
+        "php-amqplib/php-amqplib": "*",
+        "phpunit/phpunit": "~7.0",
+        "squizlabs/php_codesniffer": "3.*"
+    },
+
+    "suggest": {
+        "ext-pcntl":          "Need for process signals.",
+        "enqueue/amqp-lib":   "Enqueue for AMQP-LIB",
+        "enqueue/amqp-ext":   "Need for AMQP when using the PECL extension.",
+        "enqueue/amqp-bunny": "Enqueue for Bunny",
+        "bunny/bunny":        "Alternative for AMQP-LIB"
+    },
+
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "process-timeout": 300
+    },
+
+    "autoload": {
+        "psr-4": {
+            "BinaryCube\\CarrotMQ\\": "src"
+        }
+    },
+
+    "autoload-dev": {
+        "psr-4": {
+            "BinaryCube\\CarrotMQ\\Tests\\": "tests"
+        }
+    },
+
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://asset-packagist.org"
+        }
+    ],
+
+    "bin": [
+    ],
+
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@tests"
+        ],
+
+        "generate-reports": [
+            "@create-folders",
+            "@cs-report",
+            "@tests-report-html",
+            "@tests-report-xml",
+            "@tests-report-clover"
+        ],
+
+        "create-folders": [
+            "[ ! -d build ] && mkdir -p build || exit 0;"
+        ],
+
+        "cs-check": "phpcs",
+        "cs-fix":   "phpcbf",
+        "tests":    "phpunit",
+
+        "cs-report":            "phpcs --report=json --report-file=build/phpcs-report.json || exit 0;",
+        "tests-report-html":    "phpunit --coverage-html build/phpunit/coverage/html || exit 0;",
+        "tests-report-xml":     "phpunit --coverage-xml build/phpunit/coverage/xml || exit 0;",
+        "tests-report-clover":  "phpunit --coverage-clover build/phpunit/coverage/clover/index.xml || exit 0;"
+    },
+
+    "scripts-descriptions": {
+    }
+}
