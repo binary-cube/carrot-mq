@@ -60,7 +60,7 @@ class Publisher extends Core implements PublisherInterface
         $this->id        = $id;
         $this->container = $container;
         $this->topic     = $topic;
-        $this->config    = \array_merge(static::DEFAULTS, $config);
+        $this->config    = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
 
         $this->topic->logger($this->logger);
 

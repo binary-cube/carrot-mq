@@ -3,6 +3,7 @@
 namespace BinaryCube\CarrotMQ\Driver;
 
 use Psr\Log\LoggerInterface;
+use BinaryCube\CarrotMQ\Config;
 use Interop\Amqp\AmqpConnectionFactory;
 use Enqueue\AmqpLib\AmqpConnectionFactory   as AMQPLibConnectionFactory;
 use Enqueue\AmqpExt\AmqpConnectionFactory   as AMQPExtConnectionFactory;
@@ -100,10 +101,9 @@ class AmqpDriver extends Driver
      */
     protected function build()
     {
-        $defaults = static::DEFAULTS;
-        $config   = $this->config;
+        $config = $this->config;
 
-        if ($diff = \array_diff(\array_keys($config), \array_keys(self::DEFAULTS))) {
+        if ($diff = \array_diff(\array_keys($config), \array_keys(static::DEFAULTS))) {
             throw new InvalidConfigException(
                 \vsprintf(
                     'Cannot create driver %s, received unknown arguments: %s!',
@@ -115,7 +115,7 @@ class AmqpDriver extends Driver
             );
         }
 
-        $config = \array_merge($defaults, $config);
+        $config = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
 
         $extension = $config['extension'];
 

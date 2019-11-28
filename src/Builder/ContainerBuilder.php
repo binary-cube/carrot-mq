@@ -3,6 +3,7 @@
 namespace BinaryCube\CarrotMQ\Builder;
 
 use Psr\Log\LoggerInterface;
+use BinaryCube\CarrotMQ\Config;
 use BinaryCube\CarrotMQ\Consumer;
 use BinaryCube\CarrotMQ\Publisher;
 use BinaryCube\CarrotMQ\Component;
@@ -63,7 +64,7 @@ class ContainerBuilder extends Component
      */
     public function build(array $config)
     {
-        $config = \array_merge(static::DEFAULTS, $config);
+        $config = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
 
         $container = new Container();
 
@@ -106,17 +107,15 @@ class ContainerBuilder extends Component
      */
     protected function createTopics(Container $container, array  $config)
     {
-        $topics = $config['topics'];
+        $topics        = $config['topics'];
+        $defaultConfig = [
+            'connection' => '',
+            'name'       => '',
+            'config'     => [],
+        ];
 
         foreach ($topics as $id => $topic) {
-            $topic = \array_merge(
-                [
-                    'connection' => '',
-                    'name'       => '',
-                    'config'     => [],
-                ],
-                $topic
-            );
+            $topic = Config::create($defaultConfig)->mergeWith($topic)->toArray();
 
             if (empty($topic['name'])) {
                 throw new \RuntimeException(\vsprintf('Topic name is empty!', []));
@@ -159,17 +158,15 @@ class ContainerBuilder extends Component
      */
     protected function createQueues(Container $container, array  $config)
     {
-        $queues = $config['queues'];
+        $queues        = $config['queues'];
+        $defaultConfig = [
+            'connection' => '',
+            'name'       => '',
+            'config'     => [],
+        ];
 
         foreach ($queues as $id => $queue) {
-            $queue = \array_merge(
-                [
-                    'connection' => '',
-                    'name'       => '',
-                    'config'     => [],
-                ],
-                $queue
-            );
+            $queue = Config::create($defaultConfig)->mergeWith($queue)->toArray();
 
             if (empty($queue['name'])) {
                 throw new \RuntimeException(\vsprintf('Queue name is empty!', []));
@@ -212,16 +209,14 @@ class ContainerBuilder extends Component
      */
     protected function createPublishers(Container $container, array $config)
     {
-        $publishers = $config['publishers'];
+        $publishers    = $config['publishers'];
+        $defaultConfig = [
+            'topic'  => '',
+            'config' => [],
+        ];
 
         foreach ($publishers as $id => $publisher) {
-            $publisher = \array_merge(
-                [
-                    'topic'  => '',
-                    'config' => [],
-                ],
-                $publisher
-            );
+            $publisher = Config::create($defaultConfig)->mergeWith($publisher)->toArray();
 
             if (
                 empty($publisher['topic']) ||
@@ -259,17 +254,15 @@ class ContainerBuilder extends Component
      */
     protected function createConsumers(Container $container, array $config)
     {
-        $consumers = $config['consumers'];
+        $consumers     = $config['consumers'];
+        $defaultConfig = [
+            'queue'      => '',
+            'processor'  => null,
+            'config'     => [],
+        ];
 
         foreach ($consumers as $id => $consumer) {
-            $consumer = \array_merge(
-                [
-                    'queue'      => '',
-                    'processor'  => null,
-                    'config'     => [],
-                ],
-                $consumer
-            );
+            $consumer = Config::create($defaultConfig)->mergeWith($consumer)->toArray();
 
             if (
                 empty($consumer['queue']) ||

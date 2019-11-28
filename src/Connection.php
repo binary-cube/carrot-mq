@@ -44,7 +44,7 @@ class Connection extends Component
     {
         parent::__construct($id, $logger);
 
-        $this->config = \array_merge(static::DEFAULTS, $config);
+        $this->config = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
 
         $this->driver = new AmqpDriver((array) $this->config['config'], $this->logger);
 

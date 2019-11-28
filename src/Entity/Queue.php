@@ -6,6 +6,7 @@ use Psr\Log\LoggerInterface;
 use Interop\Amqp\AmqpQueue;
 use Interop\Amqp\AmqpContext;
 use Interop\Amqp\Impl\AmqpBind;
+use BinaryCube\CarrotMQ\Config;
 use BinaryCube\CarrotMQ\Connection;
 use BinaryCube\CarrotMQ\Exception\Exception;
 
@@ -55,7 +56,7 @@ final class Queue extends Entity
     {
         parent::__construct($id, $name, $connection, $config, $logger);
 
-        $this->config  = \array_merge(static::DEFAULTS, $config);
+        $this->config  = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
         $this->context = $this->connection->context();
     }
 
@@ -142,15 +143,14 @@ final class Queue extends Entity
             return $this;
         }
 
+        $defaultConfig = [
+            'topic'       => '',
+            'routing_key' => '',
+        ];
+
         foreach ($this->config['bind'] as $bind) {
             try {
-                $bind = \array_merge(
-                    [
-                        'topic'       => '',
-                        'routing_key' => '',
-                    ],
-                    $bind
-                );
+                $bind = Config::create($defaultConfig)->mergeWith($bind)->toArray();
 
                 if (empty($bind['topic'])) {
                     return $this;

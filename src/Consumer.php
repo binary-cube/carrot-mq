@@ -30,8 +30,8 @@ class Consumer extends Core implements ConsumerInterface
             'enabled'        => false,
             'prefetch_size'  => 0,
             'prefetch_count' => 0,
-            'global'         => 0,
-        ]
+            'global'         => false,
+        ],
     ];
 
     /**
@@ -83,7 +83,7 @@ class Consumer extends Core implements ConsumerInterface
         $this->container  = $container;
         $this->queue      = $topic;
         $this->processor  = $processor;
-        $this->config     = \array_merge(static::DEFAULTS, $config);
+        $this->config     = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
         $this->extensions = new Collection\ExtensionList();
 
         $this->tag =
