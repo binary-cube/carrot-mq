@@ -33,8 +33,7 @@ class CarrotMQ extends Component
     {
         parent::__construct(null, $logger);
 
-        $this->config    = $config;
-        $this->container = ContainerBuilder::create($this->config, $this->logger);
+        $this->config = $config;
 
         $this->logger->debug(\vsprintf('Instance of "%s" has been created', [self::class]));
     }
@@ -44,6 +43,10 @@ class CarrotMQ extends Component
      */
     public function container()
     {
+        if (empty($this->container)) {
+            $this->container = ContainerBuilder::create($this->config, $this->logger);
+        }
+
         return $this->container;
     }
 
