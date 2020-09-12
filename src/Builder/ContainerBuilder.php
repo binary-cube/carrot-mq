@@ -236,7 +236,7 @@ class ContainerBuilder extends Component
             $topic  = $container->topics()->get($publisher['topic']);
             $params = $publisher['config'];
 
-            $entry = new Publisher($id, $topic, $container, $params);
+            $entry = new Publisher($id, $topic, $container, $params, $this->logger);
 
             $container->publishers()->add($entry->id(), $entry);
 
@@ -307,7 +307,7 @@ class ContainerBuilder extends Component
                 );
             }
 
-            $entry = new Consumer($id, $queue, $processor, $container, $params);
+            $entry = new Consumer($id, $queue, $processor, $container, $params, $this->logger);
 
             $container->consumers()->add($entry->id(), $entry);
 
