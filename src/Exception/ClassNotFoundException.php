@@ -4,8 +4,6 @@ namespace BinaryCube\CarrotMQ\Exception;
 
 /**
  * Class ClassNotFoundException
- *
- * @package BinaryCube\CarrotMQ\Exception
  */
 class ClassNotFoundException extends Exception
 {

@@ -17,8 +17,6 @@ use BinaryCube\CarrotMQ\Exception\InvalidConfigException;
 
 /**
  * Class ContainerBuilder
- *
- * @package BinaryCube\CarrotMQ\Builder
  */
 class ContainerBuilder extends Component
 {
@@ -84,7 +82,7 @@ class ContainerBuilder extends Component
      *
      * @return $this
      */
-    protected function createConnections(Container $container, array  $config)
+    protected function createConnections(Container $container, array $config)
     {
         $connections = $config['connections'];
 
@@ -105,7 +103,7 @@ class ContainerBuilder extends Component
      *
      * @return $this
      */
-    protected function createTopics(Container $container, array  $config)
+    protected function createTopics(Container $container, array $config)
     {
         $topics        = $config['topics'];
         $defaultConfig = [
@@ -123,7 +121,7 @@ class ContainerBuilder extends Component
 
             if (
                 empty($topic['connection']) ||
-                !$container->connections()->has($topic['connection'])
+                ! $container->connections()->has($topic['connection'])
             ) {
                 throw new \RuntimeException(
                     \vsprintf(
@@ -156,7 +154,7 @@ class ContainerBuilder extends Component
      *
      * @return $this
      */
-    protected function createQueues(Container $container, array  $config)
+    protected function createQueues(Container $container, array $config)
     {
         $queues        = $config['queues'];
         $defaultConfig = [
@@ -174,7 +172,7 @@ class ContainerBuilder extends Component
 
             if (
                 empty($queue['connection']) ||
-                !$container->connections()->has($queue['connection'])
+                ! $container->connections()->has($queue['connection'])
             ) {
                 throw new \RuntimeException(
                     \vsprintf(
@@ -220,7 +218,7 @@ class ContainerBuilder extends Component
 
             if (
                 empty($publisher['topic']) ||
-                !$container->topics()->has($publisher['topic'])
+                ! $container->topics()->has($publisher['topic'])
             ) {
                 throw new \RuntimeException(
                     \vsprintf(
@@ -266,7 +264,7 @@ class ContainerBuilder extends Component
 
             if (
                 empty($consumer['queue']) ||
-                !$container->queues()->has($consumer['queue'])
+                ! $container->queues()->has($consumer['queue'])
             ) {
                 throw new \RuntimeException(
                     \vsprintf(
@@ -295,7 +293,7 @@ class ContainerBuilder extends Component
                 $processor = new $processor();
             }
 
-            if (!($processor instanceof Processor)) {
+            if (! ($processor instanceof Processor)) {
                 throw new \LogicException(
                     \vsprintf(
                         "Can't create processor, '%s' must extend from %s or its child class.",

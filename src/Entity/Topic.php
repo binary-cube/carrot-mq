@@ -12,8 +12,6 @@ use BinaryCube\CarrotMQ\Exception\Exception;
 
 /**
  * Class Topic
- *
- * @package BinaryCube\CarrotMQ\Entity
  */
 final class Topic extends Entity
 {
@@ -112,7 +110,7 @@ final class Topic extends Entity
         $exchange->setType($this->config['type']);
         $exchange->setFlags($flags);
 
-        if (!empty($this->config['arguments'])) {
+        if (! empty($this->config['arguments'])) {
             $exchange->setArguments($this->config['arguments']);
         }
 
@@ -162,14 +160,14 @@ final class Topic extends Entity
             try {
                 $bind = Config::create($defaultConfig)->mergeWith($bind)->toArray();
 
-                if (!empty($bind['queue'])) {
+                if (! empty($bind['queue'])) {
                     $queue     = $this->context->createQueue($bind['queue']);
                     $queueBind = new AmqpBind($this->model(), $queue, $bind['routing_key']);
 
                     $this->context->bind($queueBind);
                 }
 
-                if (!empty($bind['topic'])) {
+                if (! empty($bind['topic'])) {
                     $topic        = $this->context->createTopic($bind['topic']);
                     $exchangeBind = new AmqpBind($this->model(), $topic, $bind['routing_key']);
 

@@ -9,8 +9,6 @@ use BinaryCube\CarrotMQ\Entity\Queue;
 
 /**
  * Class MessageReceived
- *
- * @package BinaryCube\CarrotMQ\Event\Consumer
  */
 class MessageReceived extends Event
 {

@@ -8,8 +8,6 @@ use BinaryCube\CarrotMQ\Entity\Queue;
 
 /**
  * Class Start
- *
- * @package BinaryCube\CarrotMQ\Event\Consumer
  */
 class Start extends Event
 {

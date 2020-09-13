@@ -13,8 +13,6 @@ use BinaryCube\CarrotMQ\Exception\StopConsumerException;
 
 /**
  * Class Consumer
- *
- * @package BinaryCube\CarrotMQ
  */
 class Consumer extends Core implements ConsumerInterface
 {
@@ -87,7 +85,7 @@ class Consumer extends Core implements ConsumerInterface
         $this->extensions = new Collection\ExtensionList();
 
         $this->tag =
-            !empty($this->tag) ?
+            ! empty($this->tag) ?
                 $this->tag :
                 \vsprintf('[host: %s]-[pid: %s]-[queue: %s]', [\gethostname(), \getmypid(), $this->queue->name()]);
 
@@ -129,7 +127,7 @@ class Consumer extends Core implements ConsumerInterface
         $this->resetEvents();
 
         foreach ($this->extensions->all() as $extension) {
-            if (!\is_subclass_of($extension, Extension::class)) {
+            if (! \is_subclass_of($extension, Extension::class)) {
                 throw new Exception(
                     \vsprintf(
                         'The given class, "%s", is not an instance of "%s"',

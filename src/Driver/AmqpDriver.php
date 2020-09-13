@@ -14,8 +14,6 @@ use BinaryCube\CarrotMQ\Exception\InvalidConfigException;
 
 /**
  * Class AmqpDriver
- *
- * @package BinaryCube\CarrotMQ\Driver
  */
 class AmqpDriver extends Driver
 {
@@ -119,7 +117,7 @@ class AmqpDriver extends Driver
 
         $extension = $config['extension'];
 
-        if (empty($extension) || !isset($this->extensions[$extension])) {
+        if (empty($extension) || ! isset($this->extensions[$extension])) {
             throw new InvalidConfigException(
                 \vsprintf(
                     'The given extension "%s" is not supported. Extensions supported are "%s"',
@@ -147,7 +145,7 @@ class AmqpDriver extends Driver
 
         $class = $this->extensions[$extension];
 
-        if (!\class_exists($class)) {
+        if (! \class_exists($class)) {
             throw new ClassNotFoundException(\vsprintf('Class %s not found.', [$class]));
         }
 

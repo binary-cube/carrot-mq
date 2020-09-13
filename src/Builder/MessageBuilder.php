@@ -6,8 +6,6 @@ use Interop\Amqp\Impl\AmqpMessage;
 
 /**
  * Class MessageBuilder
- *
- * @package BinaryCube\CarrotMQ\Builder
  */
 class MessageBuilder
 {

@@ -12,8 +12,6 @@ use BinaryCube\CarrotMQ\Collection\ConnectionList;
 
 /**
  * Class Container
- *
- * @package BinaryCube\CarrotMQ
  */
 class Container
 {

@@ -6,8 +6,6 @@ use BinaryCube\CarrotMQ\Event;
 
 /**
  * Class IdleExtension
- *
- * @package BinaryCube\CarrotMQ\Extension
  */
 class IdleExtension extends Extension
 {

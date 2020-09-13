@@ -4,8 +4,6 @@ namespace BinaryCube\CarrotMQ\Exception;
 
 /**
  * Class StopConsumerException
- *
- * @package BinaryCube\CarrotMQ\Exception
  */
 class StopConsumerException extends Exception
 {

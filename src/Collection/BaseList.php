@@ -4,8 +4,6 @@ namespace BinaryCube\CarrotMQ\Collection;
 
 /**
  * Class BaseList
- *
- * @package BinaryCube\CarrotMQ\Collection
  */
 class BaseList
 {

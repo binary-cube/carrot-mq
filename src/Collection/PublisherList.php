@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Publisher;
 /**
  * Class PublisherList
  *
- * @package BinaryCube\CarrotMQ\Collection
- *
  * @method Publisher[] __invoke()
  * @method $this add(string $id, Publisher $item)
  * @method $this remove(string $id)
@@ -19,4 +17,5 @@ use BinaryCube\CarrotMQ\Publisher;
  */
 class PublisherList extends BaseList
 {
+    //
 }

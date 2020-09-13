@@ -4,8 +4,6 @@ namespace BinaryCube\CarrotMQ\Exception;
 
 /**
  * Class Exception
- *
- * @package BinaryCube\CarrotMQ\Exception
  */
 class Exception extends \Exception
 {

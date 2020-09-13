@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Connection;
 /**
  * Class ConnectionList
  *
- * @package BinaryCube\CarrotMQ\Collection
- *
  * @method Connection[] __invoke()
  * @method $this add(string $id, Connection $item)
  * @method $this remove(string $id)
@@ -19,4 +17,5 @@ use BinaryCube\CarrotMQ\Connection;
  */
 class ConnectionList extends BaseList
 {
+    //
 }

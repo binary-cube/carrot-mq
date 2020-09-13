@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Exception\Exception;
 
 /**
  * Class SignalExtension
- *
- * @package BinaryCube\CarrotMQ\Extension
  */
 class SignalExtension extends Extension
 {
@@ -70,7 +68,7 @@ class SignalExtension extends Extension
      */
     public function onStart(Event\Consumer\Start $event)
     {
-        if (!\extension_loaded('pcntl')) {
+        if (! \extension_loaded('pcntl')) {
             throw new Exception('The pcntl extension is required in order to catch signals.');
         }
 

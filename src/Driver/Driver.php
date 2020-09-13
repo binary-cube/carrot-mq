@@ -9,8 +9,6 @@ use Interop\Amqp\AmqpConnectionFactory;
 
 /**
  * Class Driver
- *
- * @package BinaryCube\CarrotMQ\Driver
  */
 abstract class Driver extends Component
 {
@@ -80,7 +78,7 @@ abstract class Driver extends Component
      */
     public function open()
     {
-        if (!empty($this->interop)) {
+        if (! empty($this->interop)) {
             return $this;
         }
 

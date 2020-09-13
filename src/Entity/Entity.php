@@ -8,8 +8,6 @@ use BinaryCube\CarrotMQ\Connection;
 
 /**
  * Class Entity
- *
- * @package BinaryCube\CarrotMQ\Entity
  */
 abstract class Entity extends Component
 {

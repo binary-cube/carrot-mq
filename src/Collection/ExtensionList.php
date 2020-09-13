@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Extension\Extension;
 /**
  * Class ExtensionList
  *
- * @package BinaryCube\CarrotMQ\Collection
- *
  * @method Extension[] __invoke()
  * @method $this add(string $id, Extension $item)
  * @method $this remove(string $id)
@@ -19,4 +17,5 @@ use BinaryCube\CarrotMQ\Extension\Extension;
  */
 class ExtensionList extends BaseList
 {
+    //
 }

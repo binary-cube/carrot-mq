@@ -6,8 +6,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**
  * Interface ExtensionInterface
- *
- * @package BinaryCube\CarrotMQ\Extension
  */
 interface ExtensionInterface extends EventSubscriberInterface
 {

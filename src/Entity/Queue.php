@@ -12,8 +12,6 @@ use BinaryCube\CarrotMQ\Exception\Exception;
 
 /**
  * Class Queue
- *
- * @package BinaryCube\CarrotMQ\Entity
  */
 final class Queue extends Entity
 {
@@ -103,7 +101,7 @@ final class Queue extends Entity
 
         $queue->setFlags($flags);
 
-        if (!empty($this->config['arguments'])) {
+        if (! empty($this->config['arguments'])) {
             $queue->setArguments($this->config['arguments']);
         }
 

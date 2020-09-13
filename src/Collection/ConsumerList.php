@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Consumer;
 /**
  * Class ConsumerList
  *
- * @package BinaryCube\CarrotMQ\Collection
- *
  * @method Consumer[] __invoke()
  * @method $this add(string $id, Consumer $item)
  * @method $this remove(string $id)
@@ -19,4 +17,5 @@ use BinaryCube\CarrotMQ\Consumer;
  */
 class ConsumerList extends BaseList
 {
+    //
 }

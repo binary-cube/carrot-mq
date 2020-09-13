@@ -6,8 +6,6 @@ use Psr\Log\LoggerInterface;
 
 /**
  * Class Core
- *
- * @package BinaryCube\CarrotMQ
  */
 abstract class Core extends Component
 {

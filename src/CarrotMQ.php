@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Builder\ContainerBuilder;
 
 /**
  * Class CarrotMQ
- *
- * @package BinaryCube\CarrotMQ
  */
 class CarrotMQ extends Component
 {

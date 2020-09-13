@@ -4,8 +4,6 @@ namespace BinaryCube\CarrotMQ;
 
 /**
  * Class Config
- *
- * @package BinaryCube\CarrotMQ
  */
 class Config
 {
@@ -86,7 +84,7 @@ class Config
         $args = \func_get_args();
         $res  = \array_shift($args);
 
-        while (!empty($args)) {
+        while (! empty($args)) {
             foreach (\array_shift($args) as $k => $v) {
                 if (\is_int($k)) {
                     if (\array_key_exists($k, $res)) {

@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Entity\Topic;
 /**
  * Class TopicList
  *
- * @package BinaryCube\CarrotMQ\Collection
- *
  * @method Topic[] __invoke()
  * @method $this add(string $id, Topic $item)
  * @method $this remove(string $id)
@@ -19,4 +17,5 @@ use BinaryCube\CarrotMQ\Entity\Topic;
  */
 class TopicList extends BaseList
 {
+    //
 }

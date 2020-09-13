@@ -10,8 +10,6 @@ use BinaryCube\CarrotMQ\Driver\AmqpDriver;
 
 /**
  * Class Connection
- *
- * @package BinaryCube\CarrotMQ
  */
 class Connection extends Component
 {
@@ -45,7 +43,6 @@ class Connection extends Component
         parent::__construct($id, $logger);
 
         $this->config = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
-
         $this->driver = new AmqpDriver((array) $this->config['config'], $this->logger);
 
         $this->open();
@@ -67,6 +64,7 @@ class Connection extends Component
     public function logger(LoggerInterface $logger)
     {
         $this->logger = $logger;
+
         $this->driver->logger($this->logger);
 
         return $this;

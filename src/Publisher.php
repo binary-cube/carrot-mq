@@ -8,8 +8,6 @@ use BinaryCube\CarrotMQ\Entity\Topic;
 
 /**
  * Class Publisher
- *
- * @package BinaryCube\CarrotMQ
  */
 class Publisher extends Core implements PublisherInterface
 {
@@ -85,7 +83,7 @@ class Publisher extends Core implements PublisherInterface
         |--------------------------------------------------------------------------
         |
         */
-        if (!$this->isTopicInstalled) {
+        if (! $this->isTopicInstalled) {
             if ($this->topic->canAutoCreate()) {
                 $this->topic->install();
             }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <ruleset name="Base Coding Standard">
 
-    <description>Base Coding Standard</description>
+    <description>Base Coding Standard - PSR12</description>
 
     <!-- README: http://edorian.github.io/php-coding-standard-generator/#phpcs -->
 
@@ -11,8 +11,10 @@
     <!-- Exclude Composer vendor directory. -->
     <exclude-pattern>*/vendor/*</exclude-pattern>
 
+
     <!-- You can hard-code custom php.ini settings into your custom standard. -->
     <ini name="memory_limit" value="256M"/>
+
 
     <!-- Call with arguments -->
     <arg name="encoding"   value="utf-8"/>
@@ -35,13 +37,15 @@
         <severity>0</severity>
     </rule>
 
+
     <!-- Don't hide tokenizer exceptions -->
     <rule ref="Internal.Tokenizer.Exception">
         <type>error</type>
     </rule>
 
+
     <!-- Include the whole PSR-2 standard -->
-    <rule ref="PSR2">
+    <rule ref="PSR12">
         <!-- To address at a later point in time. -->
         <exclude name="Generic.Files.LineLength.TooLong"/>
 
@@ -58,6 +62,7 @@
 
     <rule ref="Squiz.Arrays.ArrayDeclaration">
         <exclude name="Squiz.Arrays.ArrayDeclaration.KeySpecified"/>
+        <exclude name="Squiz.Arrays.ArrayDeclaration.NoKeySpecified"/>
         <exclude name="Squiz.Arrays.ArrayDeclaration.ValueNoNewline"/>
     </rule>
 
@@ -117,14 +122,8 @@
     <!-- Checks the declaration of the class and its inheritance is correct -->
     <rule ref="Squiz.Classes.ClassDeclaration"/>
 
-    <!-- All classes keywords should be lowercase -->
-    <rule ref="Squiz.Classes.LowercaseClassKeywords"/>
-
     <!-- Tests self member references -->
     <rule ref="Squiz.Classes.SelfMemberReference"/>
-
-    <!-- Test class names are camel-cased properly -->
-    <rule ref="Squiz.Classes.ValidClassName"/>
 
 
     <!-- ============================ -->
@@ -157,6 +156,8 @@
     <!-- ========================= -->
 
     <rule ref="Squiz.Commenting.BlockComment">
+        <exclude name="Squiz.Commenting.BlockComment.HasEmptyLineBefore"/>
+        <exclude name="Squiz.Commenting.BlockComment.NoEmptyLineBefore"/>
         <exclude name="Squiz.Commenting.BlockComment.NoEmptyLineAfter"/>
         <exclude name="Squiz.Commenting.BlockComment.SingleLine"/>
         <exclude name="Squiz.Commenting.BlockComment.CloserSameLine"/>
@@ -165,6 +166,7 @@
         <exclude name="Squiz.Commenting.BlockComment.NoNewLine"/>
         <exclude name="Squiz.Commenting.BlockComment.WrongStart"/>
     </rule>
+
     <rule ref="Squiz.Commenting.DocCommentAlignment"/>
     <rule ref="Squiz.Commenting.EmptyCatchComment"/>
     <rule ref="Squiz.Commenting.LongConditionClosingComment"/>
@@ -218,9 +220,6 @@
     <!-- Inline controls (IF, ELSE, FOR, WHILE) must have brackets -->
     <rule ref="Generic.ControlStructures.InlineControlStructure"/>
 
-    <!-- Ensures that switch statements are defined according to PSR2. -->
-    <rule ref="PSR2.ControlStructures.SwitchDeclaration"/>
-
     <!-- The keyword elseif SHOULD be used instead of else if so that all control keywords look like single words. -->
     <rule ref="PSR2.ControlStructures.ElseIfDeclaration">
         <type>error</type>
@@ -248,6 +247,9 @@
             <property name="error" value="true"/>
         </properties>
     </rule>
+
+    <!-- Force whitespace after `!` -->
+    <rule ref="Generic.Formatting.SpaceAfterNot"/>
 
 
     <!-- ======================== -->
@@ -315,6 +317,12 @@
 
     <rule ref="Generic.PHP.DisallowShortOpenTag.EchoFound"/>
 
+    <!-- Forbid global functions -->
+    <rule ref="Squiz.Functions.GlobalFunction"/>
+
+    <!-- Forbid `global` -->
+    <rule ref="Squiz.PHP.GlobalKeyword"/>
+
     <!-- Discourage unsafe functions -->
     <rule ref="Generic.PHP.ForbiddenFunctions">
         <properties>
@@ -326,6 +334,28 @@
                 <element key="print" value="echo"/>
                 <element key="is_null" value="null"/>
                 <element key="create_function" value="null"/>
+                <element key="dd" value="null"/>
+                <element key="show_source" value="highlight_file"/>
+                <element key="pos" value="current"/>
+                <element key="settype" value="null"/>
+                <element key="eval" value="null"/>
+                <element key="strchr" value="strstr"/>
+                <element key="chop" value="rtrim"/>
+                <element key="close" value="closedir"/>
+                <element key="compact" value="null"/>
+                <element key="delete" value="unset"/>
+                <element key="doubleval" value="floatval"/>
+                <element key="extract" value="null"/>
+                <element key="fputs" value="fwrite"/>
+                <element key="ini_alter" value="ini_set"/>
+                <element key="is_double" value="is_float"/>
+                <element key="is_integer" value="is_int"/>
+                <element key="is_long" value="is_int"/>
+                <element key="is_null" value="null"/>
+                <element key="is_real" value="is_float"/>
+                <element key="is_writeable" value="is_writable"/>
+                <element key="join" value="implode"/>
+                <element key="key_exists" value="array_key_exists"/>
             </property>
         </properties>
     </rule>
@@ -343,8 +373,14 @@
     <!-- Ensures all calls to builtin PHP functions are lowercase. -->
     <rule ref="Squiz.PHP.LowercasePHPFunctions"/>
 
-    <!-- Checks that all PHP types are lowercase. -->
+    <!-- Forbid backtick operator -->
+    <rule ref="Generic.PHP.BacktickOperator"/>
+
+    <!-- Force PHP 7 param and return types to be lowercased -->
     <rule ref="Generic.PHP.LowerCaseType"/>
+
+    <!-- Forbid dead code -->
+    <rule ref="Squiz.PHP.NonExecutableCode"/>
 
 
     <!-- ==================== -->
@@ -377,9 +413,16 @@
         </properties>
     </rule>
 
+    <rule ref="Squiz.Strings.DoubleQuoteUsage"/>
     <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
-        <type>warning</type>
+        <message>Variable "%s" not allowed in double quoted string; use sprintf(), vsprintf() or concatenation instead</message>
     </rule>
+
+    <!-- Forbid braces around string in `echo` -->
+    <rule ref="Squiz.Strings.EchoedStrings"/>
+
+    <!-- Forbid blank line after function opening brace -->
+    <rule ref="Squiz.WhiteSpace.FunctionOpeningBraceSpace"/>
 
 
     <!-- ============================== -->
@@ -425,6 +468,9 @@
             <property name="spacing" value="1"/>
         </properties>
     </rule>
+
+    <!-- Require there be no space between increment/decrement operator and its operand -->
+    <rule ref="Generic.WhiteSpace.IncrementDecrementSpacing"/>
 
     <!-- Object operators must be indented 4 spaces if they are the first thing on a line. -->
     <rule ref="PEAR.WhiteSpace.ObjectOperatorIndent"/>
@@ -472,35 +518,14 @@
     <!-- === Namespace and Use Declarations Sniffs === -->
     <!-- ============================================= -->
 
-    <!-- There must be one blank line after the namespace declaration. -->
-    <rule ref="PSR2.Namespaces.NamespaceDeclaration"/>
-
-    <!-- Ensures USE blocks are declared according to PSR2. -->
-    <rule ref="PSR2.Namespaces.UseDeclaration"/>
-
 
     <!-- ======================================== -->
     <!-- === Classes, Properties, and Methods === -->
     <!-- ======================================== -->
-    <rule ref="PSR12.Classes.ClassInstantiation"/>
 
     <!-- Private properties MUST not be prefixed with an underscore -->
     <rule ref="PSR2.Classes.PropertyDeclaration.Underscore">
         <type>error</type>
     </rule>
-
-    <!-- Only one argument per line in multi-line function calls -->
-    <rule ref="PEAR.Functions.FunctionCallSignature">
-        <properties>
-            <property name="allowMultipleArguments" value="false"/>
-        </properties>
-    </rule>
-
-    <!-- Private methods MUST not be prefixed with an underscore -->
-    <rule ref="PSR2.Methods.MethodDeclaration.Underscore">
-        <type>error</type>
-    </rule>
-
-    <rule ref="PSR12.Keywords.ShortFormTypeKeywords"/>
 
 </ruleset>

@@ -6,8 +6,6 @@ use BinaryCube\CarrotMQ\Event;
 
 /**
  * Class LimitConsumedMessagesExtension
- *
- * @package BinaryCube\CarrotMQ\Extension
  */
 class LimitConsumedMessagesExtension extends Extension
 {

@@ -8,8 +8,6 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class Component
- *
- * @package BinaryCube\CarrotMQ
  */
 class Component
 {
@@ -47,7 +45,7 @@ class Component
      */
     public function __construct(string $id = null, $logger = null)
     {
-        $this->id     = (!empty($id) ? $id : self::generateUniqueId());
+        $this->id     = (! empty($id) ? $id : self::generateUniqueId());
         $this->events = new EventDispatcher();
         $this->logger = empty($logger) ? new NullLogger() : $logger;
     }

@@ -7,8 +7,6 @@ use BinaryCube\CarrotMQ\Entity\Queue;
 /**
  * Class QueueList
  *
- * @package BinaryCube\CarrotMQ\Collection
- *
  * @method Queue[] __invoke()
  * @method $this add(string $id, Queue $item)
  * @method $this remove(string $id)
@@ -19,4 +17,5 @@ use BinaryCube\CarrotMQ\Entity\Queue;
  */
 class QueueList extends BaseList
 {
+    //
 }

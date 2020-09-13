@@ -9,8 +9,6 @@ use BinaryCube\CarrotMQ\Entity\Queue;
 
 /**
  * Class CallbackProcessor
- *
- * @package BinaryCube\CarrotMQ\Processor
  */
 class CallbackProcessor implements Processor
 {

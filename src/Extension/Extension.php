@@ -6,8 +6,6 @@ use BinaryCube\CarrotMQ\Component;
 
 /**
  * Class Extension
- *
- * @package BinaryCube\CarrotMQ\Extension
  */
 abstract class Extension extends Component implements ExtensionInterface
 {

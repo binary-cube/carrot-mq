@@ -9,8 +9,6 @@ use BinaryCube\CarrotMQ\Entity\Queue;
 
 /**
  * Interface Processor
- *
- * @package BinaryCube\CarrotMQ\Processor
  */
 interface Processor
 {
