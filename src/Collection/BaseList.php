@@ -81,7 +81,7 @@ class BaseList
      */
     public function has($id)
     {
-        return \array_key_exists($id, $this->items);
+        return (isset($this->items[$id]) || \array_key_exists($id, $this->items));
     }
 
 }

@@ -60,7 +60,7 @@ class Publisher extends Core implements PublisherInterface
         $this->topic     = $topic;
         $this->config    = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
 
-        $this->topic->logger($this->logger);
+        $this->topic->setLogger($this->logger);
 
         $context = $this->topic->connection()->context(true);
 

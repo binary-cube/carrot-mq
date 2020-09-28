@@ -112,7 +112,7 @@ class Container
             /* @var BaseList $context */
             foreach ($this->{$context}->all() as $entry) {
                 /* @var Component $entry */
-                $entry->logger($logger);
+                $entry->setLogger($logger);
             }
         }
 

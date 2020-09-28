@@ -61,11 +61,11 @@ class Connection extends Component
      *
      * @return $this
      */
-    public function logger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
 
-        $this->driver->logger($this->logger);
+        $this->driver->setLogger($this->logger);
 
         return $this;
     }

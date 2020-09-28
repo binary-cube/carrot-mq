@@ -89,7 +89,7 @@ class Consumer extends Core implements ConsumerInterface
                 $this->tag :
                 \vsprintf('[host: %s]-[pid: %s]-[queue: %s]', [\gethostname(), \getmypid(), $this->queue->name()]);
 
-        $this->queue->logger($this->logger);
+        $this->queue->setLogger($this->logger);
     }
 
     /**
@@ -140,7 +140,7 @@ class Consumer extends Core implements ConsumerInterface
             }
 
             /* @var Extension $extension */
-            $extension->logger($this->logger);
+            $extension->setLogger($this->logger);
 
             $this->events->addSubscriber($extension);
         }
@@ -151,7 +151,7 @@ class Consumer extends Core implements ConsumerInterface
         |--------------------------------------------------------------------------
         |
         */
-        $this->queue->logger($this->logger);
+        $this->queue->setLogger($this->logger);
 
         if ($this->queue->canAutoCreate()) {
             $this->queue->install();

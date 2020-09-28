@@ -75,11 +75,27 @@ class Component
      *
      * @return $this
      */
-    public function logger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
 
         return $this;
+    }
+
+    /**
+     * @return LoggerInterface|NullLogger
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @return void
+     */
+    public function __destruct()
+    {
+        unset($this->id, $this->events, $this->logger);
     }
 
 }
