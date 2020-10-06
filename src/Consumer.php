@@ -131,6 +131,14 @@ class Consumer extends Core implements ConsumerInterface
     }
 
     /**
+     * @return Connection
+     */
+    public function connection()
+    {
+        return $this->queue->connection();
+    }
+
+    /**
      * @return $this
      *
      * @throws Exception

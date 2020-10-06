@@ -126,7 +126,7 @@ class Publisher extends Core implements PublisherInterface
                     \call_user_func_array($onRetry, [$this, $error]);
                 }
 
-                \usleep(1e6 * $delay);
+                \usleep((int) (1e6 * $delay));
             }
         } while (--$retry > 0);
 
