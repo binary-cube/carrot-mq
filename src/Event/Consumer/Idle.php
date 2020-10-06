@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Event\Consumer;
 
 use Interop\Queue\Context;

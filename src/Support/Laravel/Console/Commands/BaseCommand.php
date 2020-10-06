@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Support\Laravel\Console\Commands;
 
 use Illuminate\Console\Command;

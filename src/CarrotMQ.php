@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ;
 
 use Psr\Log\LoggerInterface;
@@ -12,7 +14,7 @@ class CarrotMQ extends Component
 {
 
     /**
-     * @var array
+     * @var Config
      */
     protected $config;
 
@@ -31,41 +33,17 @@ class CarrotMQ extends Component
     {
         parent::__construct(null, $logger);
 
-        $this->config = $config;
+        $this->config = Config::make($config);
 
-        $this->logger->debug(\vsprintf('Instance of "%s" has been created', [self::class]));
+        $this->logger->debug(\vsprintf('Instance of "%s" has been created', [static::class]));
     }
 
     /**
-     * @return array
-     */
-    public function getConfig(): array
-    {
-        return $this->config;
-    }
-
-    /**
-     * @param array $config
-     *
      * @return $this
      */
-    public function setConfig(array $config): self
+    protected function build()
     {
-        $this->config    = $config;
-        $this->container = null;
-
-        return $this;
-    }
-
-    /**
-     * @param array $config
-     *
-     * @return $this
-     */
-    public function mergeWithConfig(array $config): self
-    {
-        $this->config    = Config::create($this->config)->mergeWith($config)->toArray();
-        $this->container = null;
+        $this->container = ContainerBuilder::create($this->config, $this->logger);
 
         return $this;
     }
@@ -75,11 +53,27 @@ class CarrotMQ extends Component
      */
     public function container()
     {
-        if (empty($this->container)) {
-            $this->container = ContainerBuilder::create($this->config, $this->logger);
+        if (! isset($this->container)) {
+            $this->build();
         }
 
         return $this->container;
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return $this
+     */
+    public function reload($config = [])
+    {
+        $this->config = Config::make($config);
+
+        if (isset($this->container)) {
+            $this->build();
+        }
+
+        return $this;
     }
 
 }

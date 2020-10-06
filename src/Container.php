@@ -1,14 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ;
 
-use Psr\Log\LoggerInterface;
-use BinaryCube\CarrotMQ\Collection\BaseList;
-use BinaryCube\CarrotMQ\Collection\QueueList;
-use BinaryCube\CarrotMQ\Collection\TopicList;
-use BinaryCube\CarrotMQ\Collection\ConsumerList;
-use BinaryCube\CarrotMQ\Collection\PublisherList;
-use BinaryCube\CarrotMQ\Collection\ConnectionList;
+use BinaryCube\CarrotMQ\Collection\QueueRepository;
+use BinaryCube\CarrotMQ\Collection\TopicRepository;
+use BinaryCube\CarrotMQ\Collection\ConsumerRepository;
+use BinaryCube\CarrotMQ\Collection\PublisherRepository;
+use BinaryCube\CarrotMQ\Collection\ConnectionRepository;
 
 /**
  * Class Container
@@ -17,27 +17,27 @@ class Container
 {
 
     /**
-     * @var ConnectionList
+     * @var ConnectionRepository
      */
     private $connections;
 
     /**
-     * @var TopicList
+     * @var TopicRepository
      */
     private $topics;
 
     /**
-     * @var QueueList
+     * @var QueueRepository
      */
     private $queues;
 
     /**
-     * @var PublisherList
+     * @var PublisherRepository
      */
     private $publishers;
 
     /**
-     * @var ConsumerList
+     * @var ConsumerRepository
      */
     private $consumers;
 
@@ -46,15 +46,15 @@ class Container
      */
     public function __construct()
     {
-        $this->connections = new ConnectionList();
-        $this->topics      = new TopicList();
-        $this->queues      = new QueueList();
-        $this->publishers  = new PublisherList();
-        $this->consumers   = new ConsumerList();
+        $this->connections = new ConnectionRepository();
+        $this->topics      = new TopicRepository();
+        $this->queues      = new QueueRepository();
+        $this->publishers  = new PublisherRepository();
+        $this->consumers   = new ConsumerRepository();
     }
 
     /**
-     * @return ConnectionList
+     * @return ConnectionRepository
      */
     public function connections()
     {
@@ -62,7 +62,7 @@ class Container
     }
 
     /**
-     * @return TopicList
+     * @return TopicRepository
      */
     public function topics()
     {
@@ -70,7 +70,7 @@ class Container
     }
 
     /**
-     * @return QueueList
+     * @return QueueRepository
      */
     public function queues()
     {
@@ -78,7 +78,7 @@ class Container
     }
 
     /**
-     * @return PublisherList
+     * @return PublisherRepository
      */
     public function publishers()
     {
@@ -86,37 +86,11 @@ class Container
     }
 
     /**
-     * @return ConsumerList
+     * @return ConsumerRepository
      */
     public function consumers()
     {
         return $this->consumers;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     *
-     * @return $this;
-     */
-    public function logger(LoggerInterface $logger)
-    {
-        $contexts = [
-            'connections',
-            'topics',
-            'queues',
-            'publishers',
-            'consumers',
-        ];
-
-        foreach ($contexts as $context) {
-            /* @var BaseList $context */
-            foreach ($this->{$context}->all() as $entry) {
-                /* @var Component $entry */
-                $entry->setLogger($logger);
-            }
-        }
-
-        return $this;
     }
 
 }

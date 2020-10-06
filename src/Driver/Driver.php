@@ -1,17 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Driver;
 
 use Psr\Log\LoggerInterface;
 use Interop\Amqp\AmqpContext;
 use BinaryCube\CarrotMQ\Component;
 use Interop\Amqp\AmqpConnectionFactory;
+use BinaryCube\CarrotMQ\Support\LoggerAwareTrait;
 
 /**
  * Class Driver
  */
 abstract class Driver extends Component
 {
+    use LoggerAwareTrait;
 
     /**
      * @const array Default driver parameters

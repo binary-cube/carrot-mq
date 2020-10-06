@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Extension;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;

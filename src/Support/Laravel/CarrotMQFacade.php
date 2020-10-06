@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Support\Laravel;
 
 use Illuminate\Support\Facades\Facade;

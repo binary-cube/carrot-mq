@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ;
 
 use Psr\Log\LoggerInterface;
@@ -7,12 +9,15 @@ use Interop\Amqp\AmqpContext;
 use BinaryCube\CarrotMQ\Driver\Driver;
 use Interop\Amqp\AmqpConnectionFactory;
 use BinaryCube\CarrotMQ\Driver\AmqpDriver;
+use BinaryCube\CarrotMQ\Support\Collection;
+use BinaryCube\CarrotMQ\Support\LoggerAwareTrait;
 
 /**
  * Class Connection
  */
 class Connection extends Component
 {
+    use LoggerAwareTrait;
 
     /**
      * @var Driver
@@ -42,7 +47,7 @@ class Connection extends Component
     {
         parent::__construct($id, $logger);
 
-        $this->config = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
+        $this->config = Collection::make(static::DEFAULTS)->merge($config)->all();
         $this->driver = new AmqpDriver((array) $this->config['config'], $this->logger);
 
         $this->open();

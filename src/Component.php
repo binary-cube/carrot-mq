@@ -1,10 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ;
 
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\EventDispatcher\EventDispatcher;
 
 /**
  * Class Component
@@ -16,11 +17,6 @@ class Component
      * @var string
      */
     protected $id;
-
-    /**
-     * @var EventDispatcher
-     */
-    protected $events;
 
     /**
      * The logger instance.
@@ -46,7 +42,6 @@ class Component
     public function __construct(string $id = null, $logger = null)
     {
         $this->id     = (! empty($id) ? $id : self::generateUniqueId());
-        $this->events = new EventDispatcher();
         $this->logger = empty($logger) ? new NullLogger() : $logger;
     }
 
@@ -59,43 +54,11 @@ class Component
     }
 
     /**
-     * @return $this
-     */
-    public function resetEvents()
-    {
-        $this->events = new EventDispatcher();
-
-        return $this;
-    }
-
-    /**
-     * Sets a logger instance on the object.
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return $this
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-
-        return $this;
-    }
-
-    /**
-     * @return LoggerInterface|NullLogger
-     */
-    public function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
      * @return void
      */
     public function __destruct()
     {
-        unset($this->id, $this->events, $this->logger);
+        unset($this->id, $this->logger);
     }
 
 }

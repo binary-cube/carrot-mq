@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Support\Laravel\Console\Commands;
 
 use BinaryCube\CarrotMQ\Consumer;
@@ -76,8 +78,10 @@ class ConsumerCommand extends BaseCommand
         }
 
         foreach ($extensions as $extension) {
-            /* @var Extension\Extension $extension */
-            $consumer->extensions()->add($extension::name(), $extension);
+            /**
+             * @var Extension\Extension $extension
+             */
+            $consumer->extensions()->put($extension::name(), $extension);
         }
     }
 

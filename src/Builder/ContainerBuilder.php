@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Builder;
 
 use Psr\Log\LoggerInterface;
@@ -11,6 +13,7 @@ use BinaryCube\CarrotMQ\Container;
 use BinaryCube\CarrotMQ\Connection;
 use BinaryCube\CarrotMQ\Entity\Queue;
 use BinaryCube\CarrotMQ\Entity\Topic;
+use BinaryCube\CarrotMQ\Support\Collection;
 use BinaryCube\CarrotMQ\Processor\Processor;
 use BinaryCube\CarrotMQ\Processor\CallbackProcessor;
 use BinaryCube\CarrotMQ\Exception\InvalidConfigException;
@@ -33,12 +36,12 @@ class ContainerBuilder extends Component
     ];
 
     /**
-     * @param array                $config
+     * @param Config               $config
      * @param LoggerInterface|null $logger
      *
      * @return Container
      */
-    public static function create(array $config, $logger = null)
+    public static function create(Config $config, $logger = null)
     {
         $builder = new static($logger);
 
@@ -56,13 +59,13 @@ class ContainerBuilder extends Component
     }
 
     /**
-     * @param array $config
+     * @param Config $config
      *
      * @return Container
      */
-    public function build(array $config)
+    public function build(Config $config)
     {
-        $config = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
+        $config = Collection::make(static::DEFAULTS)->merge($config->all())->all();
 
         $container = new Container();
 
@@ -89,7 +92,7 @@ class ContainerBuilder extends Component
         foreach ($connections as $id => $connection) {
             $entry = new Connection($id, $connection, $this->logger);
 
-            $container->connections()->add($entry->id(), $entry);
+            $container->connections()->put($entry->id(), $entry);
 
             $this->logger->debug(\vsprintf('Connection with ID: "%s" has been created', [$entry->id()]));
         }
@@ -105,15 +108,16 @@ class ContainerBuilder extends Component
      */
     protected function createTopics(Container $container, array $config)
     {
-        $topics        = $config['topics'];
-        $defaultConfig = [
+        $topics = $config['topics'];
+
+        $default = [
             'connection' => '',
             'name'       => '',
             'config'     => [],
         ];
 
         foreach ($topics as $id => $topic) {
-            $topic = Config::create($defaultConfig)->mergeWith($topic)->toArray();
+            $topic = Collection::make($default)->merge($topic)->all();
 
             if (empty($topic['name'])) {
                 throw new \RuntimeException(\vsprintf('Topic name is empty!', []));
@@ -140,7 +144,7 @@ class ContainerBuilder extends Component
 
             $entry = new Topic($id, $name, $connection, $params, $this->logger);
 
-            $container->topics()->add($entry->id(), $entry);
+            $container->topics()->put($entry->id(), $entry);
 
             $this->logger->debug(\vsprintf('Topic with ID: "%s" has been created', [$entry->id()]));
         }//end foreach
@@ -156,15 +160,16 @@ class ContainerBuilder extends Component
      */
     protected function createQueues(Container $container, array $config)
     {
-        $queues        = $config['queues'];
-        $defaultConfig = [
+        $queues = $config['queues'];
+
+        $default = [
             'connection' => '',
             'name'       => '',
             'config'     => [],
         ];
 
         foreach ($queues as $id => $queue) {
-            $queue = Config::create($defaultConfig)->mergeWith($queue)->toArray();
+            $queue = Collection::make($default)->merge($queue)->all();
 
             if (empty($queue['name'])) {
                 throw new \RuntimeException(\vsprintf('Queue name is empty!', []));
@@ -191,7 +196,7 @@ class ContainerBuilder extends Component
 
             $entry = new Queue($id, $name, $connection, $params, $this->logger);
 
-            $container->queues()->add($entry->id(), $entry);
+            $container->queues()->put($entry->id(), $entry);
 
             $this->logger->debug(\vsprintf('Queue with ID: "%s" has been created', [$entry->id()]));
         }//end foreach
@@ -207,14 +212,15 @@ class ContainerBuilder extends Component
      */
     protected function createPublishers(Container $container, array $config)
     {
-        $publishers    = $config['publishers'];
-        $defaultConfig = [
+        $publishers = $config['publishers'];
+
+        $default = [
             'topic'  => '',
             'config' => [],
         ];
 
         foreach ($publishers as $id => $publisher) {
-            $publisher = Config::create($defaultConfig)->mergeWith($publisher)->toArray();
+            $publisher = Collection::make($default)->merge($publisher)->all();
 
             if (
                 empty($publisher['topic']) ||
@@ -236,7 +242,7 @@ class ContainerBuilder extends Component
 
             $entry = new Publisher($id, $topic, $container, $params, $this->logger);
 
-            $container->publishers()->add($entry->id(), $entry);
+            $container->publishers()->put($entry->id(), $entry);
 
             $this->logger->debug(\vsprintf('Publisher with ID: "%s" has been created', [$entry->id()]));
         }//end foreach
@@ -252,15 +258,16 @@ class ContainerBuilder extends Component
      */
     protected function createConsumers(Container $container, array $config)
     {
-        $consumers     = $config['consumers'];
-        $defaultConfig = [
+        $consumers = $config['consumers'];
+
+        $default = [
             'queue'      => '',
             'processor'  => null,
             'config'     => [],
         ];
 
         foreach ($consumers as $id => $consumer) {
-            $consumer = Config::create($defaultConfig)->mergeWith($consumer)->toArray();
+            $consumer = Collection::make($default)->merge($consumer)->all();
 
             if (
                 empty($consumer['queue']) ||
@@ -307,7 +314,7 @@ class ContainerBuilder extends Component
 
             $entry = new Consumer($id, $queue, $processor, $container, $params, $this->logger);
 
-            $container->consumers()->add($entry->id(), $entry);
+            $container->consumers()->put($entry->id(), $entry);
 
             $this->logger->debug(\vsprintf('Consumer with ID: "%s" has been created', [$entry->id()]));
         }//end foreach

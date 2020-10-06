@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Driver;
 
 use Psr\Log\LoggerInterface;
-use BinaryCube\CarrotMQ\Config;
 use Interop\Amqp\AmqpConnectionFactory;
-use Enqueue\AmqpLib\AmqpConnectionFactory   as AMQPLibConnectionFactory;
-use Enqueue\AmqpExt\AmqpConnectionFactory   as AMQPExtConnectionFactory;
-use Enqueue\AmqpBunny\AmqpConnectionFactory as AMQPBunnyConnectionFactory;
+use BinaryCube\CarrotMQ\Support\Collection;
 use BinaryCube\CarrotMQ\Exception\Exception;
 use BinaryCube\CarrotMQ\Exception\ClassNotFoundException;
 use BinaryCube\CarrotMQ\Exception\InvalidConfigException;
+use Enqueue\AmqpLib\AmqpConnectionFactory   as AMQPLibConnectionFactory;
+use Enqueue\AmqpExt\AmqpConnectionFactory   as AMQPExtConnectionFactory;
+use Enqueue\AmqpBunny\AmqpConnectionFactory as AMQPBunnyConnectionFactory;
 
 /**
  * Class AmqpDriver
@@ -113,7 +115,7 @@ class AmqpDriver extends Driver
             );
         }
 
-        $config = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
+        $config = Collection::make(static::DEFAULTS)->merge($config)->all();
 
         $extension = $config['extension'];
 
@@ -149,7 +151,9 @@ class AmqpDriver extends Driver
             throw new ClassNotFoundException(\vsprintf('Class %s not found.', [$class]));
         }
 
-        /* @var AmqpConnectionFactory $connection */
+        /**
+         * @var AmqpConnectionFactory $connection
+         */
         $connection = new $class($config);
 
         return $connection;

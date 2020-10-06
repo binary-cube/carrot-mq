@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ;
 
 /**
@@ -7,5 +9,5 @@ namespace BinaryCube\CarrotMQ;
  */
 interface PublisherInterface
 {
-
+    //
 }

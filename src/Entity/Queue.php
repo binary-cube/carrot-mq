@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Entity;
 
 use Psr\Log\LoggerInterface;
 use Interop\Amqp\AmqpQueue;
 use Interop\Amqp\AmqpContext;
 use Interop\Amqp\Impl\AmqpBind;
-use BinaryCube\CarrotMQ\Config;
 use BinaryCube\CarrotMQ\Connection;
+use BinaryCube\CarrotMQ\Support\Collection;
 use BinaryCube\CarrotMQ\Exception\Exception;
 
 /**
@@ -54,7 +56,7 @@ final class Queue extends Entity
     {
         parent::__construct($id, $name, $connection, $config, $logger);
 
-        $this->config  = Config::create(static::DEFAULTS)->mergeWith($config)->toArray();
+        $this->config  = Collection::make(static::DEFAULTS)->merge($config)->all();
         $this->context = $this->connection->context();
     }
 
@@ -141,14 +143,14 @@ final class Queue extends Entity
             return $this;
         }
 
-        $defaultConfig = [
+        $default = [
             'topic'       => '',
             'routing_key' => '',
         ];
 
         foreach ($this->config['bind'] as $bind) {
             try {
-                $bind = Config::create($defaultConfig)->mergeWith($bind)->toArray();
+                $bind = Collection::make($default)->merge($bind)->all();
 
                 if (empty($bind['topic'])) {
                     return $this;

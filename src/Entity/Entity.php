@@ -1,16 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace BinaryCube\CarrotMQ\Entity;
 
 use Psr\Log\LoggerInterface;
 use BinaryCube\CarrotMQ\Component;
 use BinaryCube\CarrotMQ\Connection;
+use BinaryCube\CarrotMQ\Support\LoggerAwareTrait;
 
 /**
  * Class Entity
  */
 abstract class Entity extends Component
 {
+    use LoggerAwareTrait;
 
     /**
      * @var string
