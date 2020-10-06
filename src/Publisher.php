@@ -64,10 +64,21 @@ class Publisher extends Core implements PublisherInterface
         $this->config    = Collection::make(static::DEFAULTS)->merge($config)->all();
 
         $this->topic->setLogger($this->logger);
+    }
 
-        $context = $this->topic->connection()->context(true);
+    /**
+     * @param bool $refresh
+     *
+     * @return Amqp\AmqpProducer
+     */
+    protected function producer(bool $refresh = false)
+    {
+        if ($refresh || ! isset($this->producer)) {
+            $context        = $this->topic->connection()->context(true);
+            $this->producer = $context->createProducer();
+        }
 
-        $this->producer = $context->createProducer();
+        return $this->producer;
     }
 
     /**
@@ -113,7 +124,7 @@ class Publisher extends Core implements PublisherInterface
         do {
             try {
                 $this
-                    ->producer
+                    ->producer()
                     ->setPriority($message->getPriority())
                     ->setTimeToLive($message->getTimestamp())
                     ->send($this->topic->model(), $message);
@@ -121,6 +132,8 @@ class Publisher extends Core implements PublisherInterface
                 break;
             } catch (\Exception $exception) {
                 $error = $exception;
+
+                $this->producer(true);
 
                 if (isset($onRetry) && \is_callable($onRetry)) {
                     \call_user_func_array($onRetry, [$this, $error]);
