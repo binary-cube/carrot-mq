@@ -111,7 +111,7 @@ final class Queue extends Entity
             $this->context->declareQueue($queue);
         } catch (\Exception $exception) {
             if (true === $this->config['throw_exception_on_redeclare']) {
-                throw new Exception($exception);
+                throw new Exception($exception->getMessage(), $exception->getCode());
             }
         }
 
@@ -162,7 +162,7 @@ final class Queue extends Entity
                 $this->context->bind($bind);
             } catch (\Exception $exception) {
                 if (true === $this->config['throw_exception_on_bind_fail']) {
-                    throw new Exception($exception);
+                    throw new Exception($exception->getMessage(), $exception->getCode());
                 }
             }//end try
         }//end foreach

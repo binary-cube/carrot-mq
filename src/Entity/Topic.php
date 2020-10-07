@@ -120,7 +120,7 @@ final class Topic extends Entity
             $this->context->declareTopic($exchange);
         } catch (\Exception $exception) {
             if (true === $this->config['throw_exception_on_redeclare']) {
-                throw new Exception($exception);
+                throw new Exception($exception->getMessage(), $exception->getCode());
             }
         }
 
@@ -177,7 +177,7 @@ final class Topic extends Entity
                 }
             } catch (\Exception $exception) {
                 if (true === $this->config['throw_exception_on_bind_fail']) {
-                    throw new Exception($exception);
+                    throw new Exception($exception->getMessage(), $exception->getCode());
                 }
             }//end try
         }//end foreach
