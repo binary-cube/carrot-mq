@@ -133,8 +133,6 @@ class Publisher extends Core implements PublisherInterface
             } catch (\Exception $exception) {
                 $error = $exception;
 
-                $this->producer(true);
-
                 if (isset($onRetry) && \is_callable($onRetry)) {
                     \call_user_func_array($onRetry, [$this, $error]);
                 }
