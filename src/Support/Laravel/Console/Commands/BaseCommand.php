@@ -42,7 +42,7 @@ abstract class BaseCommand extends Command
             return $this->handleInternal();
         } catch (\Exception $exception) {
             $this->error('Something went wrong! Check the log for more information.');
-            Log::error($exception->getMessage());
+            Log::error((string) $exception);
         }
 
         return 0;
