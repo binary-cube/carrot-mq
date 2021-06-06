@@ -74,7 +74,7 @@ class MessageBuilder
     /**
      * @return AmqpMessage
      */
-    public function build()
+    public function build(): AmqpMessage
     {
         $message = new AmqpMessage();
 

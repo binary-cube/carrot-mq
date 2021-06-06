@@ -10,6 +10,19 @@ use Traversable;
 use ArrayIterator;
 use IteratorAggregate;
 
+use function count;
+use function is_int;
+use function is_array;
+use function is_string;
+use function array_keys;
+use function array_shift;
+use function array_values;
+use function array_unshift;
+use function func_get_args;
+use function array_key_exists;
+use function iterator_to_array;
+use function forward_static_call_array;
+
 /**
  * Class Collection
  */
@@ -52,12 +65,12 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
     {
         $arr = $items;
 
-        if (\is_array($items)) {
+        if (is_array($items)) {
             return $items;
         } elseif ($items instanceof Collection) {
             $arr = $items->all();
         } elseif ($items instanceof Traversable) {
-            $arr = \iterator_to_array($items);
+            $arr = iterator_to_array($items);
         }
 
         return static::mergeWith([], (array) $arr);
@@ -76,7 +89,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      */
     public function keys()
     {
-        return new static(\array_keys($this->items));
+        return new static(array_keys($this->items));
     }
 
     /**
@@ -86,7 +99,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      */
     public function values()
     {
-        return new static(\array_values($this->items));
+        return new static(array_values($this->items));
     }
 
     /**
@@ -189,11 +202,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      */
     public function merge(array $a): self
     {
-        $args = $this->getArrayableItems(\func_get_args());
+        $args = $this->getArrayableItems(func_get_args());
 
-        \array_unshift($args, $this->items);
+        array_unshift($args, $this->items);
 
-        $this->items = \forward_static_call_array([static::class, 'mergeWith'], $args);
+        $this->items = forward_static_call_array([static::class, 'mergeWith'], $args);
 
         return $this;
     }
@@ -223,7 +236,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      */
     public function count(): int
     {
-        return \count($this->items);
+        return count($this->items);
     }
 
     /**
@@ -267,7 +280,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
     {
         return (
             isset($this->items[$key])
-            || \array_key_exists($key, $this->items)
+            || array_key_exists($key, $this->items)
         );
     }
 
@@ -341,13 +354,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      */
     protected static function isAssociative(array $array, bool $allStrings = true)
     {
-        if (! \is_array($array) || empty($array)) {
+        if (! is_array($array) || empty($array)) {
             return false;
         }
 
         if ($allStrings) {
             foreach ($array as $key => $value) {
-                if (! \is_string($key)) {
+                if (! is_string($key)) {
                     return false;
                 }
             }
@@ -356,7 +369,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
         }
 
         foreach ($array as $key => $value) {
-            if (\is_string($key)) {
+            if (is_string($key)) {
                 return true;
             }
         }
@@ -372,18 +385,18 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate
      */
     protected static function mergeWith(array $a, array $b)
     {
-        $args = \func_get_args();
-        $res  = \array_shift($args);
+        $args = func_get_args();
+        $res  = array_shift($args);
 
         while (! empty($args)) {
-            foreach (\array_shift($args) as $k => $v) {
-                if (\is_int($k)) {
-                    if (\array_key_exists($k, $res)) {
+            foreach (array_shift($args) as $k => $v) {
+                if (is_int($k)) {
+                    if (array_key_exists($k, $res)) {
                         $res[] = $v;
                     } else {
                         $res[$k] = $v;
                     }
-                } elseif (\is_array($v) && isset($res[$k]) && \is_array($res[$k])) {
+                } elseif (is_array($v) && isset($res[$k]) && is_array($res[$k])) {
                     $res[$k] = static::mergeWith($res[$k], $v);
                 } else {
                     $res[$k] = $v;

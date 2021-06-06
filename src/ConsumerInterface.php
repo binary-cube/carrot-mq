@@ -11,8 +11,8 @@ interface ConsumerInterface
 {
 
     /**
-     * @return integer
+     * @return int
      */
-    public function consume();
+    public function consume(): int;
 
 }

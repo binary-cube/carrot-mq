@@ -7,12 +7,9 @@ namespace BinaryCube\CarrotMQ\Support\Laravel;
 use Psr\Log\LoggerInterface;
 use BinaryCube\CarrotMQ\CarrotMQ;
 use Illuminate\Foundation\Application;
-use BinaryCube\CarrotMQ\Support\Laravel\Console\Commands\ListCommand;
-use BinaryCube\CarrotMQ\Support\Laravel\Console\Commands\SetupCommand;
-use BinaryCube\CarrotMQ\Support\Laravel\Console\Commands\PurgeCommand;
-use BinaryCube\CarrotMQ\Support\Laravel\Console\Commands\ConsumerCommand;
-use BinaryCube\CarrotMQ\Support\Laravel\Console\Commands\DeleteAllCommand;
-use BinaryCube\CarrotMQ\Support\Laravel\Console\Commands\PublisherCommand;
+use BinaryCube\CarrotMQ\Support\Laravel\Console\Commands as Commands;
+
+use function is_array;
 
 /**
  * Class CarrotMQServiceProvider
@@ -57,28 +54,22 @@ class CarrotMQServiceProvider extends \Illuminate\Support\ServiceProvider
     {
         $config = config('carrot_mq', []);
 
-        if (! \is_array($config)) {
+        if (! is_array($config)) {
             throw new \RuntimeException(
                 'Invalid configuration provided for CarrotMQ-Laravel!'
             );
         }
 
-        $this->app->bind(
-            'carrot.mq',
-            function (Application $app) {
-                return app(CarrotMQ::class);
-            }
-        );
+        $this->app->bind('carrot.mq', function (Application $app) {
+            return app(CarrotMQ::class);
+        });
 
-        $this->app->singleton(
-            CarrotMQ::class,
-            function (Application $app, $arguments) use ($config) {
-                $logger = $app->make(LoggerInterface::class);
-                $carrot = new CarrotMQ($config, $logger);
+        $this->app->singleton(CarrotMQ::class, function (Application $app, $arguments) use ($config) {
+            $logger = $app->make(LoggerInterface::class);
+            $carrot = new CarrotMQ($config, $logger);
 
-                return $carrot;
-            }
-        );
+            return $carrot;
+        });
     }
 
     /**
@@ -92,12 +83,12 @@ class CarrotMQServiceProvider extends \Illuminate\Support\ServiceProvider
 
         $this->commands(
             [
-                ListCommand::class,
-                SetupCommand::class,
-                ConsumerCommand::class,
-                DeleteAllCommand::class,
-                PurgeCommand::class,
-                PublisherCommand::class,
+                Commands\ListCommand::class,
+                Commands\SetupCommand::class,
+                Commands\ConsumerCommand::class,
+                Commands\DeleteAllCommand::class,
+                Commands\PurgeCommand::class,
+                Commands\PublisherCommand::class,
             ]
         );
     }
@@ -107,7 +98,7 @@ class CarrotMQServiceProvider extends \Illuminate\Support\ServiceProvider
      */
     protected function getConfigFile()
     {
-        return __DIR__ . '/config/carrot_mq.php';
+        return (__DIR__ . '/config/carrot_mq.php');
     }
 
 }

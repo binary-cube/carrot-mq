@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace BinaryCube\CarrotMQ;
 
+use Throwable;
 use Interop\Amqp;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use BinaryCube\CarrotMQ\Event;
 use BinaryCube\CarrotMQ\Entity;
@@ -13,13 +15,22 @@ use BinaryCube\CarrotMQ\Extension\Extension;
 use BinaryCube\CarrotMQ\Exception\Exception;
 use BinaryCube\CarrotMQ\Support\DispatcherAwareTrait;
 use BinaryCube\CarrotMQ\Collection\ExtensionRepository;
+use BinaryCube\CarrotMQ\Support\AutoWireAwareTrait;
 use BinaryCube\CarrotMQ\Exception\StopConsumerException;
+
+use function vsprintf;
+use function getmypid;
+use function microtime;
+use function get_class;
+use function gethostname;
+use function is_subclass_of;
 
 /**
  * Class Consumer
  */
 class Consumer extends Core implements ConsumerInterface
 {
+    use AutoWireAwareTrait;
     use DispatcherAwareTrait;
 
     /**
@@ -66,7 +77,7 @@ class Consumer extends Core implements ConsumerInterface
      * Constructor.
      *
      * @param string               $id
-     * @param Entity\Queue         $topic
+     * @param Entity\Queue         $queue
      * @param Processor\Processor  $processor
      * @param Container            $container
      * @param array                $config
@@ -74,25 +85,26 @@ class Consumer extends Core implements ConsumerInterface
      */
     public function __construct(
         string $id,
-        Entity\Queue $topic,
+        Entity\Queue $queue,
         Processor\Processor $processor,
         Container $container,
         array $config = [],
-        $logger = null
+        ?LoggerInterface $logger = null
     ) {
         parent::__construct($id, $container, $logger);
 
         $this->id         = $id;
+        $this->queue      = $queue;
         $this->container  = $container;
-        $this->queue      = $topic;
         $this->processor  = $processor;
         $this->config     = Collection::make(static::DEFAULTS)->merge($config)->all();
         $this->extensions = new ExtensionRepository();
 
-        $this->tag =
-            ! empty($this->tag) ?
-                $this->tag :
-                \vsprintf('[host: %s]-[pid: %s]-[queue: %s]', [\gethostname(), \getmypid(), $this->queue->name()]);
+        $this->tag = (
+            ! empty($this->tag)
+                ? $this->tag
+                : vsprintf('[host: %s]-[pid: %s]-[queue: %s]', [gethostname(), getmypid(), $this->queue->name()])
+        );
 
         $this->queue->setLogger($this->logger);
     }
@@ -117,7 +129,7 @@ class Consumer extends Core implements ConsumerInterface
     /**
      * @return ExtensionRepository
      */
-    public function extensions()
+    public function extensions(): ExtensionRepository
     {
         return $this->extensions;
     }
@@ -125,7 +137,7 @@ class Consumer extends Core implements ConsumerInterface
     /**
      * @return Entity\Queue
      */
-    public function queue()
+    public function queue(): Entity\Queue
     {
         return $this->queue;
     }
@@ -133,7 +145,7 @@ class Consumer extends Core implements ConsumerInterface
     /**
      * @return Connection
      */
-    public function connection()
+    public function connection(): Connection
     {
         return $this->queue->connection();
     }
@@ -148,12 +160,12 @@ class Consumer extends Core implements ConsumerInterface
         $this->dispatcher(true);
 
         foreach ($this->extensions->all() as $extension) {
-            if (! \is_subclass_of($extension, Extension::class)) {
+            if (! is_subclass_of($extension, Extension::class)) {
                 throw new Exception(
-                    \vsprintf(
+                    vsprintf(
                         'The given class, "%s", is not an instance of "%s"',
                         [
-                            \get_class($extension),
+                            get_class($extension),
                             Extension::class,
                         ]
                     )
@@ -165,20 +177,12 @@ class Consumer extends Core implements ConsumerInterface
              */
             $extension->setLogger($this->logger);
 
-            $this->dispatcher()->addSubscriber($extension);
+            $this->dispatcher->addSubscriber($extension);
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | Setup Queue
-        |--------------------------------------------------------------------------
-        |
-        */
         $this->queue->setLogger($this->logger);
 
-        if ($this->queue->canAutoCreate()) {
-            $this->queue->install();
-        }
+        $this->autoWire($this->container);
 
         return $this;
     }
@@ -186,16 +190,15 @@ class Consumer extends Core implements ConsumerInterface
     /**
      * @return int
      *
-     * @throws \Exception
+     * @throws Throwable
      */
-    public function consume()
+    public function consume(): int
     {
-        $startTime      = \microtime(true);
-        $receiveTimeout = $this->config['receive_timeout'];
         $qos            = $this->config['qos'];
+        $receiveTimeout = (int) ($this->config['receive_timeout'] * 1e3);
 
         $this->logger->debug(
-            \vsprintf(
+            vsprintf(
                 'Consumer "%s" start consuming queue "%s" ("%s")',
                 [$this->id(), $this->queue->id(), $this->queue->name()]
             )
@@ -203,7 +206,7 @@ class Consumer extends Core implements ConsumerInterface
 
         $this->prepare();
 
-        $context = $this->queue->connection()->context(true);
+        $context = $this->queue->context(true);
 
         if ($qos['enabled']) {
             $context->setQos((int) $qos['prefetch_size'], (int) $qos['prefetch_count'], (bool) $qos['global']);
@@ -245,6 +248,8 @@ class Consumer extends Core implements ConsumerInterface
             }
         );
 
+        $startTime = microtime(true);
+
         /*
         |--------------------------------------------------------------------------
         | Start Event
@@ -252,16 +257,18 @@ class Consumer extends Core implements ConsumerInterface
         |
         */
         $startEvent = new Event\Consumer\Start($this->queue, $context, $startTime);
-        $this->dispatcher()->dispatch($startEvent, Event\Consumer\Start::name());
+
+        $this->dispatcher->dispatch($startEvent, Event\Consumer\Start::name());
 
         if ($startEvent->isExecutionInterrupted()) {
             $this->end($this->queue, $context, $startTime, $startEvent->exitStatus(), $subscription);
+
             return 0;
         }
 
         while (true) {
             try {
-                $subscription->consume((int) ($receiveTimeout * 1e3));
+                $subscription->consume($receiveTimeout);
 
                 /*
                 |--------------------------------------------------------------------------
@@ -270,19 +277,22 @@ class Consumer extends Core implements ConsumerInterface
                 |
                 */
                 $idleEvent = new Event\Consumer\Idle($this->queue, $context);
-                $this->dispatcher()->dispatch($idleEvent, Event\Consumer\Idle::name());
+
+                $this->dispatcher->dispatch($idleEvent, Event\Consumer\Idle::name());
 
                 if ($idleEvent->isExecutionInterrupted()) {
                     $this->end($this->queue, $context, $startTime, $idleEvent->exitStatus(), $subscription);
-                    return 0;
+                    break;
                 }
+                //
             } catch (StopConsumerException $exception) {
                 $this->end($this->queue, $context, $startTime, null, $subscription);
-                return 0;
-            } catch (\Exception $exception) {
+                break;
+            } catch (Throwable $exception) {
                 $this->end($this->queue, $context, $startTime, 0, $subscription);
                 throw $exception;
             }//end try
+            //end try
         }//end while
 
         return 0;
@@ -297,9 +307,9 @@ class Consumer extends Core implements ConsumerInterface
      *
      * @throws StopConsumerException
      */
-    private function handle($message, $consumer, $context)
+    private function handle($message, $consumer, $context): bool
     {
-        $receivedAt = \microtime(true);
+        $receivedAt = microtime(true);
 
         /*
         |--------------------------------------------------------------------------
@@ -308,7 +318,8 @@ class Consumer extends Core implements ConsumerInterface
         |
         */
         $messageReceivedEvent = new Event\Consumer\MessageReceived($this->queue, $context, $message, $receivedAt);
-        $this->dispatcher()->dispatch($messageReceivedEvent, Event\Consumer\MessageReceived::name());
+
+        $this->dispatcher->dispatch($messageReceivedEvent, Event\Consumer\MessageReceived::name());
 
         $result = $this->processor->process($message, $context);
 
@@ -329,8 +340,7 @@ class Consumer extends Core implements ConsumerInterface
                 break;
 
             default:
-                throw new \LogicException(\vsprintf('Status is not supported: %s', [$result]));
-                break;
+                throw new LogicException(vsprintf('Status is not supported: %s', [$result]));
         }
 
         /*
@@ -340,7 +350,8 @@ class Consumer extends Core implements ConsumerInterface
         |
         */
         $afterMessageReceived = new Event\Consumer\AfterMessageReceived($this->queue, $context, $message, $receivedAt, $result);
-        $this->dispatcher()->dispatch($afterMessageReceived, Event\Consumer\AfterMessageReceived::name());
+
+        $this->dispatcher->dispatch($afterMessageReceived, Event\Consumer\AfterMessageReceived::name());
 
         if ($afterMessageReceived->isExecutionInterrupted()) {
             throw new StopConsumerException();
@@ -365,29 +376,34 @@ class Consumer extends Core implements ConsumerInterface
         ?int $exitStatus = null,
         Amqp\AmqpSubscriptionConsumer $subscription = null
     ) {
-        $endTime = \microtime(true);
+        $endTime = microtime(true);
 
         $endEvent = new Event\Consumer\End($queue, $context, $startTime, $endTime, $exitStatus);
-        $this->dispatcher()->dispatch($endEvent, Event\Consumer\End::name());
+
+        $this->dispatcher->dispatch($endEvent, Event\Consumer\End::name());
 
         try {
             $this->processor->unmount();
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             // Do nothing.
         }
 
-        if ($subscription) {
-            $subscription->unsubscribeAll();
+        try {
+            if ($subscription) {
+                $subscription->unsubscribeAll();
+            }
+        } catch (Throwable $exception) {
+            // Do nothing.
         }
 
         try {
             $this->queue->connection()->close();
-        } catch (\Exception $exception) {
+        } catch (Throwable $exception) {
             // Do nothing.
         }
 
         $this->logger->debug(
-            \vsprintf(
+            vsprintf(
                 'Consumer "%s" stop consuming queue "%s" ("%s")',
                 [$this->id(), $this->queue->id(), $this->queue->name()]
             )

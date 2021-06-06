@@ -56,7 +56,7 @@ class Container
     /**
      * @return ConnectionRepository
      */
-    public function connections()
+    public function connections(): ConnectionRepository
     {
         return $this->connections;
     }
@@ -64,7 +64,7 @@ class Container
     /**
      * @return TopicRepository
      */
-    public function topics()
+    public function topics(): TopicRepository
     {
         return $this->topics;
     }
@@ -72,7 +72,7 @@ class Container
     /**
      * @return QueueRepository
      */
-    public function queues()
+    public function queues(): QueueRepository
     {
         return $this->queues;
     }
@@ -80,7 +80,7 @@ class Container
     /**
      * @return PublisherRepository
      */
-    public function publishers()
+    public function publishers(): PublisherRepository
     {
         return $this->publishers;
     }
@@ -88,7 +88,7 @@ class Container
     /**
      * @return ConsumerRepository
      */
-    public function consumers()
+    public function consumers(): ConsumerRepository
     {
         return $this->consumers;
     }

@@ -22,7 +22,7 @@ trait DispatcherAwareTrait
      *
      * @return EventDispatcher
      */
-    protected function dispatcher($fresh = false)
+    protected function dispatcher(bool $fresh = false): EventDispatcher
     {
         if ($fresh || ! isset($this->dispatcher)) {
             $this->dispatcher = new EventDispatcher();

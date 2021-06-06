@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace BinaryCube\CarrotMQ\Driver;
 
+use Throwable;
 use Psr\Log\LoggerInterface;
 use Interop\Amqp\AmqpContext;
 use BinaryCube\CarrotMQ\Component;
@@ -16,6 +17,14 @@ use BinaryCube\CarrotMQ\Support\LoggerAwareTrait;
 abstract class Driver extends Component
 {
     use LoggerAwareTrait;
+
+    const STATE_OPEN  = 'open';
+    const STATE_CLOSE = 'close';
+
+    /**
+     * @var string
+     */
+    private $state = self::STATE_CLOSE;
 
     /**
      * @const array Default driver parameters
@@ -43,7 +52,7 @@ abstract class Driver extends Component
      * @param array                $config
      * @param LoggerInterface|null $logger
      */
-    public function __construct($config = [], $logger = null)
+    public function __construct(array $config = [], ?LoggerInterface $logger = null)
     {
         parent::__construct(null, $logger);
 
@@ -53,12 +62,7 @@ abstract class Driver extends Component
     /**
      * @return AmqpConnectionFactory
      */
-    abstract protected function build();
-
-    /**
-     * @return AmqpConnectionFactory
-     */
-    public function interop()
+    public function interop(): AmqpConnectionFactory
     {
         return $this->interop;
     }
@@ -68,9 +72,9 @@ abstract class Driver extends Component
      *
      * @return AmqpContext
      */
-    public function context($new = false)
+    public function context(bool $new = false): AmqpContext
     {
-        if (empty($this->context) || $new) {
+        if ($new || empty($this->context)) {
             $this->context = $this->interop->createContext();
         }
 
@@ -78,15 +82,24 @@ abstract class Driver extends Component
     }
 
     /**
+     * @return string
+     */
+    public function state(): string
+    {
+        return $this->state;
+    }
+
+    /**
      * @return $this
      */
     public function open()
     {
-        if (! empty($this->interop)) {
+        if ($this->state === self::STATE_OPEN) {
             return $this;
         }
 
         $this->interop = $this->build();
+        $this->state   = self::STATE_OPEN;
 
         return $this;
     }
@@ -96,16 +109,15 @@ abstract class Driver extends Component
      */
     public function close()
     {
-        if ($this->context) {
-            try {
-                $this->context->close();
-            } catch (\Exception $e) {
-                /* Ignore on shutdown. */
-            }
+        try {
+            $this->context->close();
+        } catch (Throwable $e) {
+            /* Ignore on shutdown. */
         }
 
         $this->context = null;
         $this->interop = null;
+        $this->state   = self::STATE_CLOSE;
 
         return $this;
     }
@@ -118,6 +130,26 @@ abstract class Driver extends Component
         $this->close()->open();
 
         return $this;
+    }
+
+    /**
+     * @return AmqpConnectionFactory
+     */
+    abstract protected function build(): AmqpConnectionFactory;
+
+    /**
+     * @return void
+     */
+    public function __destruct()
+    {
+        $this->close();
+
+        unset(
+            $this->state,
+            $this->config,
+            $this->context,
+            $this->interop
+        );
     }
 
 }

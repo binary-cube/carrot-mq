@@ -7,12 +7,18 @@ namespace BinaryCube\CarrotMQ\Driver;
 use Psr\Log\LoggerInterface;
 use Interop\Amqp\AmqpConnectionFactory;
 use BinaryCube\CarrotMQ\Support\Collection;
-use BinaryCube\CarrotMQ\Exception\Exception;
 use BinaryCube\CarrotMQ\Exception\ClassNotFoundException;
 use BinaryCube\CarrotMQ\Exception\InvalidConfigException;
 use Enqueue\AmqpLib\AmqpConnectionFactory   as AMQPLibConnectionFactory;
 use Enqueue\AmqpExt\AmqpConnectionFactory   as AMQPExtConnectionFactory;
 use Enqueue\AmqpBunny\AmqpConnectionFactory as AMQPBunnyConnectionFactory;
+
+use function implode;
+use function vsprintf;
+use function array_keys;
+use function array_diff;
+use function class_exists;
+use function array_filter;
 
 /**
  * Class AmqpDriver
@@ -86,11 +92,11 @@ class AmqpDriver extends Driver
      * @param array                $config
      * @param LoggerInterface|null $logger
      */
-    public function __construct($config = [], $logger = null)
+    public function __construct($config = [], ?LoggerInterface $logger = null)
     {
         parent::__construct($config, $logger);
 
-        $this->logger->debug(\vsprintf('Instance of "%s" has been created', [self::class]));
+        $this->logger->debug(vsprintf('Instance of "%s" has been created', [self::class]));
     }
 
     /**
@@ -99,17 +105,17 @@ class AmqpDriver extends Driver
      * @throws ClassNotFoundException
      * @throws InvalidConfigException
      */
-    protected function build()
+    protected function build(): AmqpConnectionFactory
     {
         $config = $this->config;
 
-        if ($diff = \array_diff(\array_keys($config), \array_keys(static::DEFAULTS))) {
+        if ($diff = array_diff(array_keys($config), array_keys(static::DEFAULTS))) {
             throw new InvalidConfigException(
-                \vsprintf(
+                vsprintf(
                     'Cannot create driver %s, received unknown arguments: %s!',
                     [
                         (string) self::class,
-                        \implode(', ', $diff),
+                        implode(', ', $diff),
                     ]
                 )
             );
@@ -121,11 +127,11 @@ class AmqpDriver extends Driver
 
         if (empty($extension) || ! isset($this->extensions[$extension])) {
             throw new InvalidConfigException(
-                \vsprintf(
+                vsprintf(
                     'The given extension "%s" is not supported. Extensions supported are "%s"',
                     [
                         $extension,
-                        \implode('", "', \array_keys($this->extensions)),
+                        implode('", "', array_keys($this->extensions)),
                     ]
                 )
             );
@@ -138,7 +144,7 @@ class AmqpDriver extends Driver
         unset($config['extension'], $config['username'], $config['password']);
 
         // Remove the attributes with null value.
-        $config = \array_filter(
+        $config = array_filter(
             $config,
             function ($value) {
                 return null !== $value;
@@ -147,8 +153,8 @@ class AmqpDriver extends Driver
 
         $class = $this->extensions[$extension];
 
-        if (! \class_exists($class)) {
-            throw new ClassNotFoundException(\vsprintf('Class %s not found.', [$class]));
+        if (! class_exists($class)) {
+            throw new ClassNotFoundException(vsprintf('Class %s not found.', [$class]));
         }
 
         /**

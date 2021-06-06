@@ -6,11 +6,16 @@ namespace BinaryCube\CarrotMQ\Entity;
 
 use Interop\Amqp\AmqpTopic;
 use Psr\Log\LoggerInterface;
-use Interop\Amqp\AmqpContext;
 use Interop\Amqp\Impl\AmqpBind;
 use BinaryCube\CarrotMQ\Connection;
 use BinaryCube\CarrotMQ\Support\Collection;
 use BinaryCube\CarrotMQ\Exception\Exception;
+
+use function vsprintf;
+use function filter_var;
+use function array_reduce;
+use function array_filter;
+use function array_intersect_key;
 
 /**
  * Class Topic
@@ -47,11 +52,6 @@ final class Topic extends Entity
     ];
 
     /**
-     * @var AmqpContext
-     */
-    private $context;
-
-    /**
      * Constructor.
      *
      * @param string               $id
@@ -60,20 +60,24 @@ final class Topic extends Entity
      * @param array                $config
      * @param LoggerInterface|null $logger
      */
-    public function __construct(string $id, string $name, Connection $connection, $config = [], $logger = null)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        Connection $connection,
+        array $config = [],
+        ?LoggerInterface $logger = null
+    ) {
         parent::__construct($id, $name, $connection, $config, $logger);
 
-        $this->config  = Collection::make(static::DEFAULTS)->merge($config)->all();
-        $this->context = $this->connection->context();
+        $this->config = Collection::make(static::DEFAULTS)->merge($config)->all();
     }
 
     /**
      * @return AmqpTopic
      */
-    public function model()
+    public function model(): AmqpTopic
     {
-        return $this->context->createTopic($this->name());
+        return $this->context()->createTopic($this->name());
     }
 
     /**
@@ -93,10 +97,10 @@ final class Topic extends Entity
             'nowait'     => AmqpTopic::FLAG_NOWAIT,
         ];
 
-        $flags = \array_reduce(
-            \array_intersect_key(
+        $flags = array_reduce(
+            array_intersect_key(
                 $properties,
-                \array_filter(
+                array_filter(
                     $this->config,
                     function ($value) {
                         return $value === true;
@@ -117,14 +121,14 @@ final class Topic extends Entity
         }
 
         try {
-            $this->context->declareTopic($exchange);
+            $this->context()->declareTopic($exchange);
         } catch (\Exception $exception) {
             if (true === $this->config['throw_exception_on_redeclare']) {
                 throw new Exception($exception->getMessage(), $exception->getCode());
             }
         }
 
-        $this->logger->debug(\vsprintf('Topic "%s" ("%s") has been created', [$this->id(), $this->name()]));
+        $this->logger->debug(vsprintf('Topic "%s" ("%s") has been created', [$this->id(), $this->name()]));
 
         return $this;
     }
@@ -134,9 +138,9 @@ final class Topic extends Entity
      */
     public function delete()
     {
-        $this->context->deleteTopic($this->model());
+        $this->context()->deleteTopic($this->model());
 
-        $this->logger->debug(\vsprintf('Topic "%s" ("%s") has been deleted', [$this->id(), $this->name()]));
+        $this->logger->debug(vsprintf('Topic "%s" ("%s") has been deleted', [$this->id(), $this->name()]));
 
         return $this;
     }
@@ -163,17 +167,17 @@ final class Topic extends Entity
                 $bind = Collection::make($default)->merge($bind)->all();
 
                 if (! empty($bind['queue'])) {
-                    $queue     = $this->context->createQueue($bind['queue']);
+                    $queue     = $this->context()->createQueue($bind['queue']);
                     $queueBind = new AmqpBind($this->model(), $queue, $bind['routing_key']);
 
-                    $this->context->bind($queueBind);
+                    $this->context()->bind($queueBind);
                 }
 
                 if (! empty($bind['topic'])) {
-                    $topic        = $this->context->createTopic($bind['topic']);
+                    $topic        = $this->context()->createTopic($bind['topic']);
                     $exchangeBind = new AmqpBind($this->model(), $topic, $bind['routing_key']);
 
-                    $this->context->bind($exchangeBind);
+                    $this->context()->bind($exchangeBind);
                 }
             } catch (\Exception $exception) {
                 if (true === $this->config['throw_exception_on_bind_fail']) {
@@ -182,7 +186,7 @@ final class Topic extends Entity
             }//end try
         }//end foreach
 
-        $this->logger->debug(\vsprintf('Setup Topic Binds for "%s" - "%s"', [$this->id(), $this->name()]));
+        $this->logger->debug(vsprintf('Setup Topic Binds for "%s" - "%s"', [$this->id(), $this->name()]));
 
         return $this;
     }
@@ -190,7 +194,7 @@ final class Topic extends Entity
     /**
      * @return boolean
      */
-    public function exists()
+    public function exists(): bool
     {
         $result = false;
 
@@ -199,7 +203,7 @@ final class Topic extends Entity
 
             $exchange->setFlags(AmqpTopic::FLAG_PASSIVE);
 
-            $this->context->declareTopic($exchange);
+            $this->context()->declareTopic($exchange);
 
             $result = true;
         } catch (\Exception $exception) {
@@ -220,9 +224,9 @@ final class Topic extends Entity
     /**
      * @return boolean
      */
-    public function canAutoCreate()
+    public function canAutoCreate(): bool
     {
-        return \filter_var($this->config['auto_create'], FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->config['auto_create'], FILTER_VALIDATE_BOOLEAN);
     }
 
     /**

@@ -16,7 +16,12 @@ use BinaryCube\CarrotMQ\Entity\Topic;
 use BinaryCube\CarrotMQ\Support\Collection;
 use BinaryCube\CarrotMQ\Processor\Processor;
 use BinaryCube\CarrotMQ\Processor\CallbackProcessor;
-use BinaryCube\CarrotMQ\Exception\InvalidConfigException;
+
+use function vsprintf;
+use function is_string;
+use function get_class;
+use function is_callable;
+use function class_exists;
 
 /**
  * Class ContainerBuilder
@@ -41,7 +46,7 @@ class ContainerBuilder extends Component
      *
      * @return Container
      */
-    public static function create(Config $config, $logger = null)
+    public static function create(Config $config, ?LoggerInterface $logger = null)
     {
         $builder = new static($logger);
 
@@ -53,7 +58,7 @@ class ContainerBuilder extends Component
      *
      * @param LoggerInterface|null $logger
      */
-    public function __construct($logger = null)
+    public function __construct(?LoggerInterface $logger = null)
     {
         parent::__construct(null, $logger);
     }
@@ -63,7 +68,7 @@ class ContainerBuilder extends Component
      *
      * @return Container
      */
-    public function build(Config $config)
+    public function build(Config $config): Container
     {
         $config = Collection::make(static::DEFAULTS)->merge($config->all())->all();
 
@@ -94,7 +99,7 @@ class ContainerBuilder extends Component
 
             $container->connections()->put($entry->id(), $entry);
 
-            $this->logger->debug(\vsprintf('Connection with ID: "%s" has been created', [$entry->id()]));
+            $this->logger->debug(vsprintf('Connection with ID: "%s" has been created', [$entry->id()]));
         }
 
         return $this;
@@ -120,7 +125,7 @@ class ContainerBuilder extends Component
             $topic = Collection::make($default)->merge($topic)->all();
 
             if (empty($topic['name'])) {
-                throw new \RuntimeException(\vsprintf('Topic name is empty!', []));
+                throw new \RuntimeException(vsprintf('Topic name is empty!', []));
             }
 
             if (
@@ -128,7 +133,7 @@ class ContainerBuilder extends Component
                 ! $container->connections()->has($topic['connection'])
             ) {
                 throw new \RuntimeException(
-                    \vsprintf(
+                    vsprintf(
                         'Could not create topic "%s": connection name "%s" is not defined!',
                         [
                             $topic['name'],
@@ -146,7 +151,7 @@ class ContainerBuilder extends Component
 
             $container->topics()->put($entry->id(), $entry);
 
-            $this->logger->debug(\vsprintf('Topic with ID: "%s" has been created', [$entry->id()]));
+            $this->logger->debug(vsprintf('Topic with ID: "%s" has been created', [$entry->id()]));
         }//end foreach
 
         return $this;
@@ -172,7 +177,7 @@ class ContainerBuilder extends Component
             $queue = Collection::make($default)->merge($queue)->all();
 
             if (empty($queue['name'])) {
-                throw new \RuntimeException(\vsprintf('Queue name is empty!', []));
+                throw new \RuntimeException(vsprintf('Queue name is empty!', []));
             }
 
             if (
@@ -180,7 +185,7 @@ class ContainerBuilder extends Component
                 ! $container->connections()->has($queue['connection'])
             ) {
                 throw new \RuntimeException(
-                    \vsprintf(
+                    vsprintf(
                         'Could not create queue "%s": connection name "%s" is not defined!',
                         [
                             $queue['name'],
@@ -198,7 +203,7 @@ class ContainerBuilder extends Component
 
             $container->queues()->put($entry->id(), $entry);
 
-            $this->logger->debug(\vsprintf('Queue with ID: "%s" has been created', [$entry->id()]));
+            $this->logger->debug(vsprintf('Queue with ID: "%s" has been created', [$entry->id()]));
         }//end foreach
 
         return $this;
@@ -227,7 +232,7 @@ class ContainerBuilder extends Component
                 ! $container->topics()->has($publisher['topic'])
             ) {
                 throw new \RuntimeException(
-                    \vsprintf(
+                    vsprintf(
                         'Could not create publisher "%s": topic id "%s" is not defined!',
                         [
                             $id,
@@ -244,7 +249,7 @@ class ContainerBuilder extends Component
 
             $container->publishers()->put($entry->id(), $entry);
 
-            $this->logger->debug(\vsprintf('Publisher with ID: "%s" has been created', [$entry->id()]));
+            $this->logger->debug(vsprintf('Publisher with ID: "%s" has been created', [$entry->id()]));
         }//end foreach
 
         return $this;
@@ -274,7 +279,7 @@ class ContainerBuilder extends Component
                 ! $container->queues()->has($consumer['queue'])
             ) {
                 throw new \RuntimeException(
-                    \vsprintf(
+                    vsprintf(
                         'Could not create consumer "%s": queue id "%s" is not defined!',
                         [
                             $id,
@@ -294,18 +299,18 @@ class ContainerBuilder extends Component
                         return false;
                     }
                 );
-            } elseif (\is_callable($processor)) {
+            } elseif (is_callable($processor)) {
                 $processor = new CallbackProcessor($processor);
-            } elseif (\is_string($processor) && \class_exists($processor)) {
+            } elseif (is_string($processor) && class_exists($processor)) {
                 $processor = new $processor();
             }
 
             if (! ($processor instanceof Processor)) {
                 throw new \LogicException(
-                    \vsprintf(
+                    vsprintf(
                         "Can't create processor, '%s' must extend from %s or its child class.",
                         [
-                            \get_class($processor),
+                            get_class($processor),
                             Processor::class,
                         ]
                     )
@@ -316,7 +321,7 @@ class ContainerBuilder extends Component
 
             $container->consumers()->put($entry->id(), $entry);
 
-            $this->logger->debug(\vsprintf('Consumer with ID: "%s" has been created', [$entry->id()]));
+            $this->logger->debug(vsprintf('Consumer with ID: "%s" has been created', [$entry->id()]));
         }//end foreach
 
         return $this;

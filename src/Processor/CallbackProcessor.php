@@ -9,6 +9,8 @@ use Psr\Log\LoggerInterface;
 use BinaryCube\CarrotMQ\Container;
 use BinaryCube\CarrotMQ\Entity\Queue;
 
+use function call_user_func_array;
+
 /**
  * Class CallbackProcessor
  */
@@ -69,7 +71,7 @@ class CallbackProcessor implements Processor
         Amqp\AmqpContext $context,
         Amqp\AmqpConsumer $consumer,
         Container $container = null,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger = null
     ) {
         $this->queue     = $queue;
         $this->context   = $context;
@@ -98,7 +100,7 @@ class CallbackProcessor implements Processor
      */
     public function process(Amqp\AmqpMessage $message, Amqp\AmqpContext $context)
     {
-        return \call_user_func_array($this->callback, [$message, $context]);
+        return call_user_func_array($this->callback, [$message, $context]);
     }
 
 }

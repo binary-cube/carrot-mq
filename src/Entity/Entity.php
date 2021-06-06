@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace BinaryCube\CarrotMQ\Entity;
 
 use Psr\Log\LoggerInterface;
+use Interop\Amqp\AmqpContext;
 use BinaryCube\CarrotMQ\Component;
 use BinaryCube\CarrotMQ\Connection;
 use BinaryCube\CarrotMQ\Support\LoggerAwareTrait;
@@ -40,8 +41,13 @@ abstract class Entity extends Component
      * @param array                $config
      * @param LoggerInterface|null $logger
      */
-    public function __construct(string $id, string $name, Connection $connection, $config = [], $logger = null)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        Connection $connection,
+        array $config = [],
+        ?LoggerInterface $logger = null
+    ) {
         parent::__construct($id, $logger);
 
         $this->id         = $id;
@@ -53,7 +59,7 @@ abstract class Entity extends Component
     /**
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
@@ -61,7 +67,7 @@ abstract class Entity extends Component
     /**
      * @return Connection
      */
-    public function connection()
+    public function connection(): Connection
     {
         return $this->connection;
     }
@@ -69,9 +75,19 @@ abstract class Entity extends Component
     /**
      * @return array
      */
-    public function config()
+    public function config(): array
     {
         return $this->config;
+    }
+
+    /**
+     * @param bool $refresh
+     *
+     * @return AmqpContext
+     */
+    public function context(bool $refresh = false): AmqpContext
+    {
+        return $this->connection->context($refresh);
     }
 
     /**
@@ -97,7 +113,7 @@ abstract class Entity extends Component
     /**
      * @return boolean
      */
-    abstract public function exists();
+    abstract public function exists(): bool;
 
     /**
      * @return $this
@@ -107,6 +123,16 @@ abstract class Entity extends Component
     /**
      * @return boolean
      */
-    abstract public function canAutoCreate();
+    abstract public function canAutoCreate(): bool;
+
+    /**
+     * @return $this
+     */
+    public function reconnect()
+    {
+        $this->connection->reconnect();
+
+        return $this;
+    }
 
 }

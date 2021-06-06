@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BinaryCube\CarrotMQ\Support\Laravel\Console\Commands;
 
+use function vsprintf;
+
 /**
  * Class DeleteAllCommand
  */
@@ -41,7 +43,7 @@ class DeleteAllCommand extends BaseCommand
             $entity->delete();
 
             $this->output->writeln(
-                \vsprintf(
+                vsprintf(
                     'Deleted TOPIC <info>%s</info> - <fg=yellow>%s</>',
                     [
                         $entity->id(),
@@ -61,7 +63,7 @@ class DeleteAllCommand extends BaseCommand
             $entity->delete();
 
             $this->output->writeln(
-                \vsprintf(
+                vsprintf(
                     'Deleted QUEUE <info>%s</info> - <fg=yellow>%s</>',
                     [
                         $entity->id(),
