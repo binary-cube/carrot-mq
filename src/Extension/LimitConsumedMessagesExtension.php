@@ -6,6 +6,8 @@ namespace BinaryCube\CarrotMQ\Extension;
 
 use BinaryCube\CarrotMQ\Event;
 
+use function vsprintf;
+
 /**
  * Class LimitConsumedMessagesExtension
  */
@@ -50,7 +52,7 @@ class LimitConsumedMessagesExtension extends Extension
     /**
      * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'LimitConsumedMessagesExtension';
     }
@@ -58,7 +60,7 @@ class LimitConsumedMessagesExtension extends Extension
     /**
      * @return string
      */
-    public static function description()
+    public static function description(): string
     {
         return '';
     }
@@ -81,7 +83,7 @@ class LimitConsumedMessagesExtension extends Extension
      *
      * @return void
      */
-    public function onAfterMessageReceived(Event\Consumer\AfterMessageReceived $event)
+    public function onAfterMessageReceived(Event\Consumer\AfterMessageReceived $event): void
     {
         $this->consumed++;
 
@@ -93,25 +95,25 @@ class LimitConsumedMessagesExtension extends Extension
     /**
      * @return boolean
      */
-    public function shouldBeStopped()
+    public function shouldBeStopped(): bool
     {
-        if ($this->consumed >= $this->limit) {
-            $this
-                ->logger
-                ->debug(
-                    \vsprintf(
-                        '[%s] Interrupt execution. Reached the limit of %s',
-                        [
-                            self::name(),
-                            $this->limit,
-                        ]
-                    )
-                );
-
-            return true;
+        if ($this->consumed < $this->limit) {
+            return false;
         }
 
-        return false;
+        $this
+            ->logger
+            ->debug(
+                vsprintf(
+                    '[%s] Interrupt execution. Reached the limit of %s',
+                    [
+                        self::name(),
+                        $this->limit,
+                    ]
+                )
+            );
+
+        return true;
     }
 
 }

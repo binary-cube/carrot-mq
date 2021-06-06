@@ -7,6 +7,11 @@ namespace BinaryCube\CarrotMQ\Extension;
 use BinaryCube\CarrotMQ\Event;
 use BinaryCube\CarrotMQ\Exception\Exception;
 
+use function vsprintf;
+use function pcntl_signal;
+use function extension_loaded;
+use function pcntl_async_signals;
+
 /**
  * Class SignalExtension
  */
@@ -48,7 +53,7 @@ class SignalExtension extends Extension
     /**
      * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'SignalExtension';
     }
@@ -56,7 +61,7 @@ class SignalExtension extends Extension
     /**
      * @return string
      */
-    public static function description()
+    public static function description(): string
     {
         return '';
     }
@@ -68,16 +73,16 @@ class SignalExtension extends Extension
      *
      * @throws Exception
      */
-    public function onStart(Event\Consumer\Start $event)
+    public function onStart(Event\Consumer\Start $event): void
     {
-        if (! \extension_loaded('pcntl')) {
+        if (! extension_loaded('pcntl')) {
             throw new Exception('The pcntl extension is required in order to catch signals.');
         }
 
-        \pcntl_async_signals(true);
+        pcntl_async_signals(true);
 
         foreach ([SIGTERM, SIGINT, SIGHUP, SIGQUIT] as $signal) {
-            \pcntl_signal($signal, [$this, 'handleSignal']);
+            pcntl_signal($signal, [$this, 'handleSignal']);
         }
 
         $this->interruptConsumption = false;
@@ -88,7 +93,7 @@ class SignalExtension extends Extension
      *
      * @return void
      */
-    public function onAfterMessageReceived(Event\Consumer\AfterMessageReceived $event)
+    public function onAfterMessageReceived(Event\Consumer\AfterMessageReceived $event): void
     {
         if ($this->shouldBeStopped()) {
             $event->interruptExecution();
@@ -100,7 +105,7 @@ class SignalExtension extends Extension
      *
      * @return void
      */
-    public function onIdle(Event\Consumer\Idle $event)
+    public function onIdle(Event\Consumer\Idle $event): void
     {
         if ($this->shouldBeStopped()) {
             $event->interruptExecution();
@@ -117,7 +122,7 @@ class SignalExtension extends Extension
         $this
             ->logger
             ->debug(
-                \vsprintf('[%s] Caught signal: %s', [self::name(), $signal])
+                vsprintf('[%s] Caught signal: %s', [self::name(), $signal])
             );
 
         /*
@@ -137,7 +142,7 @@ class SignalExtension extends Extension
             case SIGHUP:
                 $this
                     ->logger
-                    ->debug(\vsprintf('[%s] Interrupt consumption', [self::name()]));
+                    ->debug(vsprintf('[%s] Interrupt consumption', [self::name()]));
 
                 $this->interruptConsumption = true;
 
@@ -153,19 +158,19 @@ class SignalExtension extends Extension
     /**
      * @return boolean
      */
-    public function shouldBeStopped()
+    public function shouldBeStopped(): bool
     {
-        if ($this->interruptConsumption) {
-            $this
-                ->logger
-                ->debug(\vsprintf('[%s] Interrupt execution', [self::name()]));
-
-            $this->interruptConsumption = false;
-
-            return true;
+        if (false === $this->interruptConsumption) {
+            return false;
         }
 
-        return false;
+        $this
+            ->logger
+            ->debug(vsprintf('[%s] Interrupt execution', [self::name()]));
+
+        $this->interruptConsumption = false;
+
+        return true;
     }
 
 }

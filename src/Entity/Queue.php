@@ -12,6 +12,12 @@ use BinaryCube\CarrotMQ\Connection;
 use BinaryCube\CarrotMQ\Support\Collection;
 use BinaryCube\CarrotMQ\Exception\Exception;
 
+use function vsprintf;
+use function filter_var;
+use function array_filter;
+use function array_reduce;
+use function array_intersect_key;
+
 /**
  * Class Queue
  */
@@ -39,11 +45,6 @@ final class Queue extends Entity
     ];
 
     /**
-     * @var AmqpContext
-     */
-    private $context;
-
-    /**
      * Constructor.
      *
      * @param string               $id
@@ -52,20 +53,24 @@ final class Queue extends Entity
      * @param array                $config
      * @param LoggerInterface|null $logger
      */
-    public function __construct(string $id, string $name, Connection $connection, $config = [], $logger = null)
-    {
+    public function __construct(
+        string $id,
+        string $name,
+        Connection $connection,
+        array $config = [],
+        ?LoggerInterface $logger = null
+    ) {
         parent::__construct($id, $name, $connection, $config, $logger);
 
-        $this->config  = Collection::make(static::DEFAULTS)->merge($config)->all();
-        $this->context = $this->connection->context();
+        $this->config = Collection::make(static::DEFAULTS)->merge($config)->all();
     }
 
     /**
      * @return AmqpQueue
      */
-    public function model()
+    public function model(): AmqpQueue
     {
-        return $this->context->createQueue($this->name());
+        return $this->context()->createQueue($this->name());
     }
 
     /**
@@ -85,10 +90,10 @@ final class Queue extends Entity
             'nowait'      => AmqpQueue::FLAG_NOWAIT,
         ];
 
-        $flags = \array_reduce(
-            \array_intersect_key(
+        $flags = array_reduce(
+            array_intersect_key(
                 $properties,
-                \array_filter(
+                array_filter(
                     $this->config,
                     function ($value) {
                         return $value === true;
@@ -108,14 +113,14 @@ final class Queue extends Entity
         }
 
         try {
-            $this->context->declareQueue($queue);
+            $this->context()->declareQueue($queue);
         } catch (\Exception $exception) {
             if (true === $this->config['throw_exception_on_redeclare']) {
                 throw new Exception($exception->getMessage(), $exception->getCode());
             }
         }
 
-        $this->logger->debug(\vsprintf('Queue "%s" ("%s") has been created', [$this->id(), $this->name()]));
+        $this->logger->debug(vsprintf('Queue "%s" ("%s") has been created', [$this->id(), $this->name()]));
 
         return $this;
     }
@@ -125,9 +130,9 @@ final class Queue extends Entity
      */
     public function delete()
     {
-        $this->context->deleteQueue($this->model());
+        $this->context()->deleteQueue($this->model());
 
-        $this->logger->debug(\vsprintf('Queue "%s" ("%s") has been deleted', [$this->id(), $this->name()]));
+        $this->logger->debug(vsprintf('Queue "%s" ("%s") has been deleted', [$this->id(), $this->name()]));
 
         return $this;
     }
@@ -156,10 +161,10 @@ final class Queue extends Entity
                     return $this;
                 }
 
-                $exchange = $this->context->createTopic($bind['topic']);
+                $exchange = $this->context()->createTopic($bind['topic']);
                 $bind     = new AmqpBind($this->model(), $exchange, $bind['routing_key']);
 
-                $this->context->bind($bind);
+                $this->context()->bind($bind);
             } catch (\Exception $exception) {
                 if (true === $this->config['throw_exception_on_bind_fail']) {
                     throw new Exception($exception->getMessage(), $exception->getCode());
@@ -167,7 +172,7 @@ final class Queue extends Entity
             }//end try
         }//end foreach
 
-        $this->logger->debug(\vsprintf('Setup Queue Binds for "%s" ("%s")', [$this->id(), $this->name()]));
+        $this->logger->debug(vsprintf('Setup Queue Binds for "%s" ("%s")', [$this->id(), $this->name()]));
 
         return $this;
     }
@@ -175,7 +180,7 @@ final class Queue extends Entity
     /**
      * @return boolean
      */
-    public function exists()
+    public function exists(): bool
     {
         $result = false;
 
@@ -184,7 +189,7 @@ final class Queue extends Entity
 
             $queue->setFlags(AmqpQueue::FLAG_PASSIVE);
 
-            $this->context->deleteQueue($queue);
+            $this->context()->deleteQueue($queue);
 
             $result = true;
         } catch (\Exception $exception) {
@@ -200,12 +205,12 @@ final class Queue extends Entity
     public function purge()
     {
         try {
-            $this->context->purgeQueue($this->model());
+            $this->context()->purgeQueue($this->model());
         } catch (\Exception $exception) {
             // Do nothing.
         }
 
-        $this->logger->debug(\vsprintf('Queue "%s"("%s") has been purged', [$this->id(), $this->name()]));
+        $this->logger->debug(vsprintf('Queue "%s"("%s") has been purged', [$this->id(), $this->name()]));
 
         return $this;
     }
@@ -213,9 +218,9 @@ final class Queue extends Entity
     /**
      * @return boolean
      */
-    public function canAutoCreate()
+    public function canAutoCreate(): bool
     {
-        return \filter_var($this->config['auto_create'], FILTER_VALIDATE_BOOLEAN);
+        return filter_var($this->config['auto_create'], FILTER_VALIDATE_BOOLEAN);
     }
 
     /**

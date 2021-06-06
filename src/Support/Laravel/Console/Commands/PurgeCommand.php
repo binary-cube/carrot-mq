@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace BinaryCube\CarrotMQ\Support\Laravel\Console\Commands;
 
+use function vsprintf;
+
 /**
  * Class PurgeCommand
  */
@@ -36,7 +38,7 @@ class PurgeCommand extends BaseCommand
         $queueId = (string) $this->input->getArgument('queue');
 
         if (! $this->carrot->container()->queues()->has($queueId)) {
-            $this->error(\vsprintf('Queue "%s" not found.', [$queueId]));
+            $this->error(vsprintf('Queue "%s" not found.', [$queueId]));
             return 0;
         }
 

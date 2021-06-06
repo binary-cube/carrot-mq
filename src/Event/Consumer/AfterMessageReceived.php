@@ -53,7 +53,7 @@ class AfterMessageReceived extends Event
     /**
      * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'consumer.event.after.message.received';
     }
@@ -85,7 +85,7 @@ class AfterMessageReceived extends Event
     /**
      * @return Queue
      */
-    public function queue()
+    public function queue(): Queue
     {
         return $this->queue;
     }
@@ -93,7 +93,7 @@ class AfterMessageReceived extends Event
     /**
      * @return Context
      */
-    public function context()
+    public function context(): Context
     {
         return $this->context;
     }
@@ -101,7 +101,7 @@ class AfterMessageReceived extends Event
     /**
      * @return Message
      */
-    public function message()
+    public function message(): Message
     {
         return $this->message;
     }
@@ -109,7 +109,7 @@ class AfterMessageReceived extends Event
     /**
      * @return float
      */
-    public function receivedAt()
+    public function receivedAt(): float
     {
         return $this->receivedAt;
     }
@@ -117,7 +117,7 @@ class AfterMessageReceived extends Event
     /**
      * @return string
      */
-    public function result()
+    public function result(): string
     {
         return $this->result;
     }

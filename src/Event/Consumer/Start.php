@@ -40,9 +40,9 @@ class Start extends Event
     private $exitStatus;
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'consumer.event.start';
     }
@@ -68,7 +68,7 @@ class Start extends Event
     /**
      * @return Queue
      */
-    public function queue()
+    public function queue(): Queue
     {
         return $this->queue;
     }
@@ -76,7 +76,7 @@ class Start extends Event
     /**
      * @return Context
      */
-    public function context()
+    public function context(): Context
     {
         return $this->context;
     }
@@ -84,7 +84,7 @@ class Start extends Event
     /**
      * @return float
      */
-    public function startTime()
+    public function startTime(): float
     {
         return $this->startTime;
     }
@@ -108,7 +108,7 @@ class Start extends Event
     /**
      * @param int|null $exitStatus
      *
-     * @return void;
+     * @return void
      */
     public function interruptExecution(?int $exitStatus = null): void
     {

@@ -6,6 +6,11 @@ namespace BinaryCube\CarrotMQ\Support\Laravel\Console\Commands;
 
 use Symfony\Component\Console\Helper\TableSeparator;
 
+use function implode;
+use function in_array;
+use function vsprintf;
+use function array_merge;
+
 /**
  * Class ListCommand
  */
@@ -52,7 +57,7 @@ class ListCommand extends BaseCommand
     public function handleInternal()
     {
         $group = $this->input->getArgument('group');
-        $group = \in_array($group, $this->allowedGroups) ? $group : self::GROUP_ALL;
+        $group = in_array($group, $this->allowedGroups) ? $group : self::GROUP_ALL;
 
         $rows = [];
 
@@ -87,7 +92,7 @@ class ListCommand extends BaseCommand
         $separator = new TableSeparator();
 
         return (
-            \array_merge(
+            array_merge(
                 [],
                 $this->buildQueuesRows(),
                 [$separator],
@@ -109,12 +114,12 @@ class ListCommand extends BaseCommand
         $items  = [];
 
         foreach ($this->carrot->container()->queues()->all() as $name => $queue) {
-            $items[] = \vsprintf('%s (%s)', [$name, $queue->name()]);
+            $items[] = vsprintf('%s (%s)', [$name, $queue->name()]);
         }
 
         $result[] = [
             'queues',
-            \implode(PHP_EOL, $items),
+            implode(PHP_EOL, $items),
         ];
 
         return $result;
@@ -129,12 +134,12 @@ class ListCommand extends BaseCommand
         $items  = [];
 
         foreach ($this->carrot->container()->topics()->all() as $name => $topic) {
-            $items[] = \vsprintf('%s (%s)', [$name, $topic->name()]);
+            $items[] = vsprintf('%s (%s)', [$name, $topic->name()]);
         }
 
         $result[] = [
             'topics',
-            \implode(PHP_EOL, $items),
+            implode(PHP_EOL, $items),
         ];
 
         return $result;
@@ -149,12 +154,12 @@ class ListCommand extends BaseCommand
         $items  = [];
 
         foreach ($this->carrot->container()->consumers()->all() as $name => $consumer) {
-            $items[] = \vsprintf('%s', [$name]);
+            $items[] = vsprintf('%s', [$name]);
         }
 
         $result[] = [
             'consumers',
-            \implode(PHP_EOL, $items),
+            implode(PHP_EOL, $items),
         ];
 
         return $result;
@@ -169,12 +174,12 @@ class ListCommand extends BaseCommand
         $items  = [];
 
         foreach ($this->carrot->container()->publishers()->all() as $name => $consumer) {
-            $items[] = \vsprintf('%s', [$name]);
+            $items[] = vsprintf('%s', [$name]);
         }
 
         $result[] = [
             'publishers',
-            \implode(PHP_EOL, $items),
+            implode(PHP_EOL, $items),
         ];
 
         return $result;

@@ -15,11 +15,11 @@ interface ExtensionInterface extends EventSubscriberInterface
     /**
      * @return string
      */
-    public static function name();
+    public static function name(): string;
 
     /**
      * @return string
      */
-    public static function description();
+    public static function description(): string;
 
 }

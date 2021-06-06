@@ -51,7 +51,7 @@ interface Processor
         Amqp\AmqpContext $context,
         Amqp\AmqpConsumer $consumer,
         Container $container = null,
-        LoggerInterface $logger = null
+        ?LoggerInterface $logger = null
     );
 
     /**

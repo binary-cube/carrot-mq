@@ -6,6 +6,9 @@ namespace BinaryCube\CarrotMQ\Extension;
 
 use BinaryCube\CarrotMQ\Event;
 
+use function vsprintf;
+use function microtime;
+
 /**
  * Class IdleExtension
  */
@@ -53,7 +56,7 @@ class IdleExtension extends Extension
     /**
      * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'IdleExtension';
     }
@@ -61,7 +64,7 @@ class IdleExtension extends Extension
     /**
      * @return string
      */
-    public static function description()
+    public static function description(): string
     {
         return '';
     }
@@ -82,9 +85,9 @@ class IdleExtension extends Extension
     /**
      * @return void
      */
-    protected function tick()
+    protected function tick(): void
     {
-        $this->tick = \microtime(true);
+        $this->tick = microtime(true);
     }
 
     /**
@@ -92,7 +95,7 @@ class IdleExtension extends Extension
      *
      * @return void
      */
-    public function onTick(Event\Event $event)
+    public function onTick(Event\Event $event): void
     {
         $this->tick();
     }
@@ -102,27 +105,31 @@ class IdleExtension extends Extension
      *
      * @return void
      */
-    public function onIdle(Event\Consumer\Idle $event)
+    public function onIdle(Event\Consumer\Idle $event): void
     {
         if (
-            $this->idleTimeout > 0 &&
-            $this->tick > 0 &&
-            ((\microtime(true) - $this->tick) >= $this->idleTimeout)
+            false === (
+                $this->idleTimeout > 0 &&
+                $this->tick > 0 &&
+                ((microtime(true) - $this->tick) >= $this->idleTimeout)
+            )
         ) {
-            $this
-                ->logger
-                ->debug(
-                    \vsprintf(
-                        '[%s] Interrupt execution. Reached the limit of %s seconds',
-                        [
-                            self::name(),
-                            $this->idleTimeout,
-                        ]
-                    )
-                );
-
-            $event->interruptExecution();
+            return;
         }
+
+        $this
+            ->logger
+            ->debug(
+                vsprintf(
+                    '[%s] Interrupt execution. Reached the limit of %s seconds',
+                    [
+                        self::name(),
+                        $this->idleTimeout,
+                    ]
+                )
+            );
+
+        $event->interruptExecution();
     }
 
 }

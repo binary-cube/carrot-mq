@@ -20,16 +20,16 @@ class Connection extends Component
     use LoggerAwareTrait;
 
     /**
-     * @var Driver
-     */
-    protected $driver;
-
-    /**
      * @const array Default connections parameters
      */
     const DEFAULTS = [
         'config' => [],
     ];
+
+    /**
+     * @var Driver
+     */
+    protected $driver;
 
     /**
      * @var array
@@ -43,7 +43,7 @@ class Connection extends Component
      * @param array                $config
      * @param LoggerInterface|null $logger
      */
-    public function __construct(string $id, $config = [], $logger = null)
+    public function __construct(string $id, array $config = [], ?LoggerInterface $logger = null)
     {
         parent::__construct($id, $logger);
 
@@ -51,14 +51,6 @@ class Connection extends Component
         $this->driver = new AmqpDriver((array) $this->config['config'], $this->logger);
 
         $this->open();
-    }
-
-    /**
-     * @return void
-     */
-    public function __destruct()
-    {
-        $this->close();
     }
 
     /**
@@ -78,7 +70,7 @@ class Connection extends Component
     /**
      * @return Driver
      */
-    public function driver()
+    public function driver(): Driver
     {
         return $this->driver;
     }
@@ -86,7 +78,7 @@ class Connection extends Component
     /**
      * @return AmqpConnectionFactory
      */
-    public function interop()
+    public function interop(): AmqpConnectionFactory
     {
         return $this->driver->interop();
     }
@@ -96,7 +88,7 @@ class Connection extends Component
      *
      * @return AmqpContext
      */
-    public function context($new = false)
+    public function context(bool $new = false): AmqpContext
     {
         return $this->driver->context($new);
     }
@@ -135,6 +127,19 @@ class Connection extends Component
         $this->driver->reconnect();
 
         return $this;
+    }
+
+    /**
+     * @return void
+     */
+    public function __destruct()
+    {
+        $this->close();
+
+        unset(
+            $this->driver,
+            $this->config
+        );
     }
 
 }

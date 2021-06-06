@@ -6,6 +6,8 @@ namespace BinaryCube\CarrotMQ\Support\Laravel\Console\Commands;
 
 use Illuminate\Support\Facades\Log;
 
+use function vsprintf;
+
 /**
  * Class SetupCommand
  */
@@ -46,7 +48,7 @@ class SetupCommand extends BaseCommand
                 $entity->delete();
 
                 $this->output->writeln(
-                    \vsprintf(
+                    vsprintf(
                         'Deleted TOPIC <info>%s</info> - <fg=yellow>%s</>',
                         [
                             $entity->id(),
@@ -59,7 +61,7 @@ class SetupCommand extends BaseCommand
             $entity->install();
 
             $this->output->writeln(
-                \vsprintf(
+                vsprintf(
                     'Created <info>TOPIC</info> <fg=yellow>%s</> - <fg=yellow>%s</>',
                     [
                         $entity->name(),
@@ -80,7 +82,7 @@ class SetupCommand extends BaseCommand
                 $entity->delete();
 
                 $this->output->writeln(
-                    \vsprintf(
+                    vsprintf(
                         'Deleted QUEUE <info>%s</info> - <fg=yellow>%s</>',
                         [
                             $entity->id(),
@@ -93,7 +95,7 @@ class SetupCommand extends BaseCommand
             $entity->install();
 
             $this->output->writeln(
-                \vsprintf(
+                vsprintf(
                     'Created <info>QUEUE</info> <fg=yellow>%s</> - <fg=yellow>%s</>',
                     [
                         $entity->name(),

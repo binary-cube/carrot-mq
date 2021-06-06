@@ -105,7 +105,7 @@ $config = [
         'c1' => [
             'queue'      => 'queue-id-1',
             'processor'  => function (\Interop\Amqp\AmqpMessage $message) {
-                echo \vsprintf('Message body size: %s', [\mb_strlen($message->getBody())]) . PHP_EOL;
+                echo vsprintf('Message body size: %s', [mb_strlen($message->getBody())]) . PHP_EOL;
                 return Processor::REQUEUE;
             },
             'config'     => [

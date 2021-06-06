@@ -40,9 +40,9 @@ class End extends Event
     private $exitStatus;
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'consumer.event.end';
     }
@@ -73,7 +73,7 @@ class End extends Event
     /**
      * @return Queue
      */
-    public function queue()
+    public function queue(): Queue
     {
         return $this->queue;
     }
@@ -81,7 +81,7 @@ class End extends Event
     /**
      * @return Context
      */
-    public function context()
+    public function context(): Context
     {
         return $this->context;
     }
@@ -89,7 +89,7 @@ class End extends Event
     /**
      * @return float
      */
-    public function startTime()
+    public function startTime(): float
     {
         return $this->startTime;
     }
@@ -97,7 +97,7 @@ class End extends Event
     /**
      * @return float
      */
-    public function endTime()
+    public function endTime(): float
     {
         return $this->endTime;
     }

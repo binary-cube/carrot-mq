@@ -6,6 +6,10 @@ namespace BinaryCube\CarrotMQ\Support\Laravel\Console\Commands;
 
 use BinaryCube\CarrotMQ\Builder\MessageBuilder;
 
+use function feof;
+use function fread;
+use function vsprintf;
+
 /**
  * Class PublisherCommand
  */
@@ -44,14 +48,14 @@ class PublisherCommand extends BaseCommand
         $data        = '';
 
         if (! $this->carrot->container()->publishers()->has($publisherId)) {
-            $this->error(\vsprintf('Publisher "%s" not found.', [$publisherId]));
+            $this->error(vsprintf('Publisher "%s" not found.', [$publisherId]));
             return 0;
         }
 
         $publisher = $this->carrot->container()->publishers()->get($publisherId);
 
-        while (! \feof(STDIN)) {
-            $data .= \fread(STDIN, 8192);
+        while (! feof(STDIN)) {
+            $data .= fread(STDIN, 8192);
         }
 
         if (empty($data)) {

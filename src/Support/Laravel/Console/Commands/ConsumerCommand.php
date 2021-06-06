@@ -8,6 +8,9 @@ use BinaryCube\CarrotMQ\Consumer;
 use BinaryCube\CarrotMQ\Extension;
 use Illuminate\Support\Facades\Log;
 
+use function intval;
+use function vsprintf;
+
 /**
  * Class ConsumerCommand
  */
@@ -44,7 +47,7 @@ class ConsumerCommand extends BaseCommand
         $consumerId = (string) $this->input->getArgument('consumer');
 
         if (! $this->carrot->container()->consumers()->has($consumerId)) {
-            $this->error(\vsprintf('Consumer "%s" not found.', [$consumerId]));
+            $this->error(vsprintf('Consumer "%s" not found.', [$consumerId]));
             return 0;
         }
 
@@ -65,8 +68,8 @@ class ConsumerCommand extends BaseCommand
      */
     protected function registerExtensions(Consumer $consumer)
     {
-        $messageLimit = \intval($this->input->getOption('message-limit'));
-        $idleTimeout  = \intval($this->input->getOption('idle-timeout'));
+        $messageLimit = intval($this->input->getOption('message-limit'));
+        $idleTimeout  = intval($this->input->getOption('idle-timeout'));
 
         $extensions = [
             new Extension\SignalExtension(),

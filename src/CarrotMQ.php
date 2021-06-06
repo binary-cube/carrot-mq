@@ -7,6 +7,8 @@ namespace BinaryCube\CarrotMQ;
 use Psr\Log\LoggerInterface;
 use BinaryCube\CarrotMQ\Builder\ContainerBuilder;
 
+use function vsprintf;
+
 /**
  * Class CarrotMQ
  */
@@ -35,23 +37,13 @@ class CarrotMQ extends Component
 
         $this->config = Config::make($config);
 
-        $this->logger->debug(\vsprintf('Instance of "%s" has been created', [static::class]));
-    }
-
-    /**
-     * @return $this
-     */
-    protected function build()
-    {
-        $this->container = ContainerBuilder::create($this->config, $this->logger);
-
-        return $this;
+        $this->logger->debug(vsprintf('Instance of "%s" has been created', [static::class]));
     }
 
     /**
      * @return Container
      */
-    public function container()
+    public function container(): Container
     {
         if (! isset($this->container)) {
             $this->build();
@@ -69,9 +61,17 @@ class CarrotMQ extends Component
     {
         $this->config = Config::make($config);
 
-        if (isset($this->container)) {
-            $this->build();
-        }
+        $this->build();
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    protected function build()
+    {
+        $this->container = ContainerBuilder::create($this->config, $this->logger);
 
         return $this;
     }

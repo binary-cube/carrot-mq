@@ -7,6 +7,9 @@ namespace BinaryCube\CarrotMQ;
 use Psr\Log\NullLogger;
 use Psr\Log\LoggerInterface;
 
+use function uniqid;
+use function vsprintf;
+
 /**
  * Class Component
  */
@@ -28,9 +31,9 @@ class Component
     /**
      * @return string
      */
-    public static function generateUniqueId()
+    public static function generateUniqueId(): string
     {
-        return \vsprintf('%s.%s', [static::class, \uniqid('', true)]);
+        return vsprintf('%s.%s', [static::class, uniqid('', true)]);
     }
 
     /**
@@ -39,16 +42,16 @@ class Component
      * @param string|null          $id
      * @param LoggerInterface|null $logger
      */
-    public function __construct(string $id = null, $logger = null)
+    public function __construct(?string $id = null, ?LoggerInterface $logger = null)
     {
         $this->id     = (! empty($id) ? $id : self::generateUniqueId());
-        $this->logger = empty($logger) ? new NullLogger() : $logger;
+        $this->logger = (! empty($logger) ? $logger : new NullLogger());
     }
 
     /**
      * @return string
      */
-    public function id()
+    public function id(): string
     {
         return $this->id;
     }

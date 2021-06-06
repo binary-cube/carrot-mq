@@ -35,9 +35,9 @@ class Idle extends Event
     private $exitStatus;
 
     /**
-     * @return mixed
+     * @return string
      */
-    public static function name()
+    public static function name(): string
     {
         return 'consumer.event.idle';
     }
@@ -48,10 +48,8 @@ class Idle extends Event
      * @param Queue   $queue
      * @param Context $context
      */
-    public function __construct(
-        Queue $queue,
-        Context $context
-    ) {
+    public function __construct(Queue $queue, Context $context)
+    {
         $this->queue                = $queue;
         $this->context              = $context;
         $this->executionInterrupted = false;
@@ -60,7 +58,7 @@ class Idle extends Event
     /**
      * @return Queue
      */
-    public function queue()
+    public function queue(): Queue
     {
         return $this->queue;
     }
@@ -68,7 +66,7 @@ class Idle extends Event
     /**
      * @return Context
      */
-    public function context()
+    public function context(): Context
     {
         return $this->context;
     }
