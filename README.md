@@ -3,7 +3,7 @@
 
 <p align="center">~ Enjoy your :coffee: ~</p>
 
-[![Minimum PHP Version `PHP >= 7.1`][ico-php-require]][link-php-site]
+[![Minimum PHP Version `PHP ^ 7.2.5`][ico-php-require]][link-php-site]
 [![Latest Stable Version][ico-version]][link-packagist]
 [![Total Downloads][ico-downloads]][link-downloads]
 [![Build Status][ico-travis]][link-travis]
@@ -17,7 +17,7 @@
 
 ## Requirements
 This package requires the following
-- php >= 7.0
+- php ^ 7.2.5
 - ext-bcmath
 - ext-sockets
 
