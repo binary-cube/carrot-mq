@@ -24,7 +24,7 @@
     "prefer-stable": true,
 
     "require": {
-        "php": ">=7.1",
+        "php": "^7.2.5",
         "ext-pcntl": "*",
         "psr/log": "1.1.*",
         "symfony/event-dispatcher": "5.*",
